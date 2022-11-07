@@ -10,7 +10,9 @@ const PageContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(90deg, #aea4e3, #d3ffe8);
+  background-image: url('images/back.jpg');
+  background-repeat: no-repeat;
+  background-size: 100% 100vh;
 
   .form-container {
     display: flex;

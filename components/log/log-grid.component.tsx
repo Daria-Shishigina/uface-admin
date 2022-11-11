@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
-  DataGrid,
+  DataGridPro,
   GridColDef,
   GridValueGetterParams,
   GridToolbar,
@@ -11,7 +11,7 @@ import {
   GridToolbarDensitySelector,
   GridToolbarExport,
   GridCellParams,
-} from '@mui/x-data-grid';
+} from '@mui/x-data-grid-pro';
 import moment from 'moment';
 
 import { IStudent } from './log-list.interfaces';
@@ -108,7 +108,7 @@ const LogGrid = () => {
     <div>
       <h1>Последние проходы</h1>
       <div style={{ height: '80vh' }}>
-        <DataGrid
+        <DataGridPro
           rows={userList}
           columns={columns}
           pageSize={pageSize}

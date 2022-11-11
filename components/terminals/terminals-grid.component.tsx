@@ -1,12 +1,12 @@
 // getTerminals
 import { useEffect, useState } from 'react';
 import {
-  DataGrid,
+  DataGridPro,
   GridColDef,
   GridValueGetterParams,
   GridToolbar,
   ruRU,
-} from '@mui/x-data-grid';
+} from '@mui/x-data-grid-pro';
 
 import { Table } from 'react-bootstrap';
 import { Tr } from 'components/clients/clients.styles';
@@ -88,7 +88,7 @@ export default function TerminalsGrid() {
     <div>
       <h1>Список терминалов</h1>
       <div style={{ height: '80vh' }}>
-        <DataGrid
+        <DataGridPro
           rows={data}
           columns={columns}
           pageSize={pageSize}

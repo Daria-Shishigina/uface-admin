@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  DataGrid,
+  DataGridPro,
   ruRU,
   GridToolbar,
   useGridApiContext,
@@ -13,7 +13,7 @@ import {
   GridToolbarColumnsButton,
   GridToolbarDensitySelector,
   GridToolbarFilterButton,
-} from '@mui/x-data-grid';
+} from '@mui/x-data-grid-pro';
 import {
   IconButton,
   MenuItem,
@@ -392,7 +392,7 @@ const VisitorsGrid = () => {
 
       {/* style={{ height: '80vh' }} */}
       <div style={{ height: '80vh' }}>
-        <DataGrid
+        <DataGridPro
           rows={clients}
           columns={columns}
           pageSize={pageSize}

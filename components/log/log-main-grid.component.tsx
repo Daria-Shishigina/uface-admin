@@ -22,6 +22,23 @@ import { IStudent } from './log-list.interfaces';
 import { useQuery } from 'react-query';
 import moment from 'moment';
 import { Box } from '@mui/material';
+import {
+  GridToolbarColumnsButton,
+  GridToolbarContainer,
+  GridToolbarDensitySelector, GridToolbarExport,
+  GridToolbarFilterButton
+} from "@mui/x-data-grid";
+
+function CustomToolbar() {
+  return (
+      <GridToolbarContainer>
+        <GridToolbarColumnsButton />
+        <GridToolbarFilterButton />
+        <GridToolbarDensitySelector />
+        <GridToolbarExport csvOptions={{ utf8WithBom: true, delimiter: ';' }} />
+      </GridToolbarContainer>
+  );
+}
 
 let stateColumn: any[] = [];
 const getFormatedColumn = (filteredColumn: any[]) => {
@@ -216,6 +233,7 @@ const LogMainGrid = () => {
           rowsPerPageOptions={[5, 10, 25]}
           checkboxSelection
           disableSelectionOnClick
+          components={{ Toolbar: CustomToolbar }}
           getCellClassName={(params: GridCellParams<number>) => {
             return params.field === 'temperature' &&
               params.row.temperature < params.row.std_temperature

@@ -430,7 +430,7 @@ const VisitorsGrid = () => {
           }
         />
       </div>
-      <ModalEdit />
+      <ModalEdit func={getFolks}/>
     </>
   );
 };

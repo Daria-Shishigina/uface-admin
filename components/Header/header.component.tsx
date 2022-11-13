@@ -1,12 +1,13 @@
 import { useGlobalContext } from 'context/global';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import {useEffect, useState} from 'react';
 import { HeaderContainer } from './header.styles';
 import UserMenu from './userMenu.component';
 
 const HeaderComponents = () => {
   const router = useRouter();
   const { user, setUser } = useGlobalContext();
+
   useEffect(() => {
     if (window) {
       //@ts-ignore
@@ -22,7 +23,7 @@ const HeaderComponents = () => {
 
   return user?.status === 'success' && router.pathname !== '/login' ? (
     <HeaderContainer>
-      <UserMenu user={user} />
+      <UserMenu user={user}/>
     </HeaderContainer>
   ) : (
     <></>

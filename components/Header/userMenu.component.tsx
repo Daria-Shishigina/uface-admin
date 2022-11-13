@@ -16,7 +16,7 @@ import {
 
 //interfaces
 interface IProps {
-  user: IUser | null;
+  user: IUser | null,
 }
 
 const UserMenu = ({ user }: IProps) => {
@@ -118,6 +118,7 @@ function MenuList({ t, l, close }: IList) {
           close();
           logoutHandler();
         }}
+        onMouseLeave={close}
       >
         <span>Выйти</span>
       </ListItem>

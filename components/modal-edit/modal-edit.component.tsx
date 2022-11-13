@@ -24,7 +24,10 @@ import {
   Modal,
 } from './modal-edit.styles';
 
-const ModalEdit = () => {
+let test = {};
+
+const ModalEdit = ({func}: any) => {
+  test = func;
   const modalRef = useRef(null);
   const containerRef = useRef(null);
   const { editUser, setEditUser } = useGlobalContext();
@@ -177,9 +180,11 @@ const ModalEdit = () => {
       },
     });
 
-    const resData = await res.json();
+    let resData = await res.json();
 
     // console.log({ resData });
+    if (typeof resData === 'string') resData = JSON.parse(resData)
+    if ((resData.status === 'success') && (typeof test === 'function')) test()
     setResponse(resData);
     // display form data on success
 
@@ -696,6 +701,23 @@ const ModalEdit = () => {
                     />
                     <div className='invalid-feedback'>
                       {errors.fname?.message}
+                    </div>
+                  </div>
+                </div>
+                <div className='form-row'>
+                  <div className='form-group col'>
+                    <label>Изменить пароль</label>
+                    <input
+                        // @ts-ignore
+                        name='password'
+                        type='text'
+                        {...register('password')}
+                        className={`form-control ${
+                            errors.password ? 'is-invalid' : ''
+                        }`}
+                    />
+                    <div className='invalid-feedback'>
+                      {errors.password?.message}
                     </div>
                   </div>
                 </div>

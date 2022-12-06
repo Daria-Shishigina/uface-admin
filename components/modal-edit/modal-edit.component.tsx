@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // import type { yupResolver } from '@hookform/resolvers/yup';
@@ -23,6 +23,7 @@ import {
   LoaderContainer,
   Modal,
 } from './modal-edit.styles';
+import WebCam from "react-webcam";
 
 let test = {};
 
@@ -59,6 +60,9 @@ const ModalEdit = ({func}: any) => {
   //Для обновления главной фото
   const [mainPhotoStatus, setMainPhotoStatus] = useState<string>('');
   const [mainPhotoStep, setMainPhotoStep] = useState<boolean>(false);
+
+  const webcamRef = useRef(null);
+  const [imgSrc, setImgSrc] = useState(null);
 
   let inpFile: any = null;
 
@@ -499,6 +503,13 @@ const ModalEdit = ({func}: any) => {
       reader.onerror = (error) => reject(error);
     });
 
+  const capture = useCallback(() => {
+    const imageSrc = webcamRef?.current.getScreenshot();
+    setImgSrc(imageSrc);
+    setPhoto(imageSrc);
+    setLoadedPhoto(true);
+  }, [webcamRef, setImgSrc]);
+
   //Функции камеры и загрузки изображений
   const uploadFile = async (e: any) => {
     const file = e.currentTarget.files[0];
@@ -508,6 +519,7 @@ const ModalEdit = ({func}: any) => {
     };
     try {
       const compressedFile = await imageCompression(file, options);
+
       const result: any = await toBase64(compressedFile).catch((e) => Error(e));
       // .then((result) => console.log(result));
 
@@ -593,16 +605,12 @@ const ModalEdit = ({func}: any) => {
                       >
                         Загрузить фото
                       </button>
-                      <button
-                        type='button'
-                        className={'photo'}
-                        onClick={() => {
-                          setIsCamera(true);
-                          setSeconds(3);
-                        }}
-                      >
-                        Сфотографироваться
-                      </button>
+                      <WebCam
+                          audio={false}
+                          ref={webcamRef}
+                          style={{height: '200px', width: '260px'}}
+                          screenshotFormat="image/jpeg"  />
+                      <button onClick={capture}>Сфотографироваться</button>
                     </div>
                   )}
                 </Image>
@@ -841,6 +849,7 @@ const ModalEdit = ({func}: any) => {
                       <option value='2'>ТПУ</option>
                       <option value='3'>ТУСУР</option>
                       <option value='4'>ГМПИ (Ипполитовка)</option>
+                      <option value='6'>НовГУ</option>
                     </select>
                     <div className='invalid-feedback'>
                       {errors.vuz_kod?.message}

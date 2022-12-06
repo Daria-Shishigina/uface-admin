@@ -258,6 +258,7 @@ const VisitorsGrid = () => {
   let stateColumn: any[] = [];
   const getFormatedColumn = (filteredColumn: any[]) => {
     filteredColumn.map((cs: any) => {
+      if (cs.hide === true) return;
       if (
         cs.key.toLowerCase() === 'date_created' ||
         cs.key.toLowerCase() === 'date_updated'

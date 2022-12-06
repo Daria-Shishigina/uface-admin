@@ -35,7 +35,7 @@
     "react-query": "^3.39.1",
     "react-table": "^7.8.0",
     "react-tippy": "^1.4.0",
-    "react-webcam": "^7.0.0",
+    "react-webcam": "^7.0.1",
     "styled-components": "^5.3.3",
     "use-debounce": "^7.0.1",
     "yup": "^0.32.11",

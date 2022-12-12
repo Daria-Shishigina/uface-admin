@@ -63,6 +63,7 @@ const ModalEdit = ({func}: any) => {
 
   const webcamRef = useRef(null);
   const [imgSrc, setImgSrc] = useState(null);
+  const [imgHidden, setImgHidden] = useState(1);
 
   let inpFile: any = null;
 
@@ -605,12 +606,22 @@ const ModalEdit = ({func}: any) => {
                       >
                         Загрузить фото
                       </button>
+                      <button
+                          type='button'
+                          className={'upload'}
+                          onClick={() => {
+                            setImgHidden(!imgHidden)
+                          }}
+                      >
+                        Открыть камеру
+                      </button>
                       <WebCam
                           audio={false}
+                          hidden={imgHidden}
                           ref={webcamRef}
                           style={{height: '200px', width: '260px'}}
                           screenshotFormat="image/jpeg"  />
-                      <button onClick={capture}>Сфотографироваться</button>
+                      <button hidden={imgHidden} onClick={capture}>Сфотографироваться</button>
                     </div>
                   )}
                 </Image>

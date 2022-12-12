@@ -19,6 +19,7 @@ export default async function handler(
   const { login, password, pid } = req.body.data;
 
   let loginHeaders = new Headers();
+  loginHeaders.append('Content-Length', '10000');
   loginHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
   loginHeaders.append(
     'Authorization',
@@ -37,6 +38,8 @@ export default async function handler(
     redirect: 'follow',
     agent: httpsAgent,
   };
+
+  console.log(requestOptions)
 
   await fetch(
     `https://uface.su/persident/processfolk?pid=${pid}`,

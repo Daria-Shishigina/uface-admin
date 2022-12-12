@@ -23,6 +23,8 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
+
 import LoadingSpin from 'react-loading-spin';
 
 //Context
@@ -113,6 +115,17 @@ const PanelAndFilter = ({ canAddUser }: { canAddUser: boolean }) => {
           Создать пользователя
         </button>
       )}
+
+      {canAddUser && (
+          <button
+              type='button'
+              onClick={() => {
+              }}
+          >
+            Массовое тиражирование
+          </button>
+      )}
+
     </PanelStyles>
   );
 };
@@ -372,6 +385,9 @@ const VisitorsGrid = () => {
               </IconButton>
               <IconButton aria-label='Удалить' onClick={deleteFolk}>
                 <DeleteIcon />
+              </IconButton>
+              <IconButton aria-label='Тиражирование'>
+                <ArrowOutwardIcon />
               </IconButton>
             </>
           );

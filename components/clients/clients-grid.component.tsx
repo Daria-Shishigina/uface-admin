@@ -224,7 +224,7 @@ const VisitorsGrid = () => {
   const [maxUsers, setMaxUsers] = useState(0);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const [clients, setClients] = useState<IClient[]>([]);
+  let [clients, setClients] = useState<IClient[]>([]);
 
   const { user, setEditUser } = useGlobalContext();
 
@@ -361,22 +361,38 @@ const VisitorsGrid = () => {
 
           const deleteFolk = async (e: any) => {
             e.stopPropagation();
+
             let login = sessionStorage.getItem('login');
             let password = sessionStorage.getItem('password');
 
-            const data = { login, password, pid: params.row.personid };
-
-            // console.log({ data });
-            const delFunc = await fetch('/api/delFolk', {
+            let reqParam = {login, password, pid: params.row.personid};
+            let delFunc = fetch('/api/delFolk', {
               method: 'DELETE',
-              body: JSON.stringify({ data }),
+              body: JSON.stringify({data: reqParam}),
               headers: {
                 'Content-Type': 'application/json',
               },
             });
 
-            console.log({ delFunc });
+            data.folks = data.folks.filter(el => (el.personid !== params.row.personid));
+            setClients(data.folks);
           };
+
+          const replication = async (e: any) => {
+            let reqPar = {
+              login: sessionStorage.getItem('login'),
+              password: sessionStorage.getItem('password'),
+              personid: params.row.personid,
+            };
+
+            await fetch('/api/CopyAccsToTerminals', {
+              method: 'POST',
+              body: JSON.stringify({data: reqPar}),
+              headers: {
+                'Content-Type': 'application/json',
+              }
+            });
+          }
 
           return (
             <>
@@ -386,7 +402,7 @@ const VisitorsGrid = () => {
               <IconButton aria-label='Удалить' onClick={deleteFolk}>
                 <DeleteIcon />
               </IconButton>
-              <IconButton aria-label='Тиражирование'>
+              <IconButton aria-label='Тиражирование' onClick={replication}>
                 <ArrowOutwardIcon />
               </IconButton>
             </>

@@ -81,54 +81,98 @@ const PanelStyles = styled.div`
   }
 `;
 
-const PanelAndFilter = ({ canAddUser }: { canAddUser: boolean }) => {
+let selectedBox = [];
+
+const PanelAndFilter = ({ canAddUser, updateAfterRemoveCheckboxes }: { canAddUser: boolean, updateAfterRemoveCheckboxes: any }) => {
   const { setEditUser } = useGlobalContext();
 
   return (
-    <PanelStyles>
-      {canAddUser && (
-        <button
-          type='button'
-          onClick={() => {
-            setEditUser({
-              dateborn: '',
-              activated: false,
-              email: '',
-              fio: '',
-              fname: '',
-              lname: '',
-              sname: '',
-              id: '',
-              personid: '',
-              phone: '',
-              phone_approve: false,
-              role: '',
-              photo: '',
-              vuz_title: '',
-              vuz_kod: '',
-              role_title: '',
-              role_kod: '',
-              isCreate: true,
-            });
-          }}
-        >
-          Создать пользователя
-        </button>
-      )}
+      <PanelStyles>
+        {canAddUser && (
+            <button
+                type='button'
+                onClick={() => {
+                  setEditUser({
+                    dateborn: '',
+                    activated: false,
+                    email: '',
+                    fio: '',
+                    fname: '',
+                    lname: '',
+                    sname: '',
+                    id: '',
+                    personid: '',
+                    phone: '',
+                    phone_approve: false,
+                    role: '',
+                    photo: '',
+                    vuz_title: '',
+                    vuz_kod: '',
+                    role_title: '',
+                    role_kod: '',
+                    isCreate: true,
+                  });
+                }}
+            >
+              Создать пользователя
+            </button>
+        )}
 
-      {canAddUser && (
-          <button
-              type='button'
-              onClick={() => {
-              }}
-          >
-            Массовое тиражирование
-          </button>
-      )}
+        {canAddUser && (
+            <button
+                type='button'
+                onClick={() => massReplication()}
+            >
+              Массовое тиражирование
+            </button>
+        )}
 
-    </PanelStyles>
+        {canAddUser && (
+            <button
+                type='button'
+                onClick={() => massRemove(updateAfterRemoveCheckboxes)}
+            >
+              Массовое удаление
+            </button>
+        )}
+
+      </PanelStyles>
   );
 };
+
+function massReplication() {
+  let login = sessionStorage.getItem('login');
+  let password = sessionStorage.getItem('password');
+  for (let i = 0; i < selectedBox.length; i++) {
+    let reqParam = {login, password, personid: selectedBox[i].personid};
+    fetch('/api/CopyAccsToTerminals', {
+      method: 'POST',
+      body: JSON.stringify({data: reqParam}),
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+  }
+}
+
+/**
+ * Massive remove
+ */
+function massRemove(updateAfterRemoveCheckboxes) {
+  let login = sessionStorage.getItem('login');
+  let password = sessionStorage.getItem('password');
+  for (let i = 0; i < selectedBox.length; i++) {
+    let reqParam = {login, password, pid: selectedBox[i].personid};
+    let delFunc = fetch('/api/delFolk', {
+      method: 'DELETE',
+      body: JSON.stringify({data: reqParam}),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+  updateAfterRemoveCheckboxes();
+}
 
 function CustomPagination() {
   const apiRef = useGridApiContext();
@@ -139,77 +183,77 @@ function CustomPagination() {
   const [pageN, setNavPage] = useState<any>(page + 1);
 
   return (
-    <>
-      <div>
-        <TextField
-          type='number'
-          value={pageN}
-          onChange={(e: any) => {
-            if (e.target.value > pageCount) {
-              setNavPage(pageCount);
-              return;
-            }
+      <>
+        <div>
+          <TextField
+              type='number'
+              value={pageN}
+              onChange={(e: any) => {
+                if (e.target.value > pageCount) {
+                  setNavPage(pageCount);
+                  return;
+                }
 
-            setNavPage(e.target.value);
-          }}
-          defaultValue={pageN}
-          size='small'
-          variant='outlined'
-          hiddenLabel
-          label='Перейти на страницу'
-          onKeyPress={(e) => {
-            if (e.key !== 'Enter') {
-              return;
-            }
+                setNavPage(e.target.value);
+              }}
+              defaultValue={pageN}
+              size='small'
+              variant='outlined'
+              hiddenLabel
+              label='Перейти на страницу'
+              onKeyPress={(e) => {
+                if (e.key !== 'Enter') {
+                  return;
+                }
 
-            apiRef.current.setPage(pageN - 1);
-            setNavPage('');
-            //@ts-ignore
-            e.target.blur();
-          }}
+                apiRef.current.setPage(pageN - 1);
+                setNavPage('');
+                //@ts-ignore
+                e.target.blur();
+              }}
+          />
+        </div>
+
+        <div>
+          <Select
+              size='small'
+              value={pageSize}
+              label='Кол-во'
+              onChange={(e: any) => {
+                setPageSize(e.target.value);
+                apiRef.current.setPageSize(e.target.value);
+              }}
+          >
+            <MenuItem value={20}>20</MenuItem>
+            <MenuItem value={50}>50</MenuItem>
+            <MenuItem value={100}>100</MenuItem>
+          </Select>
+        </div>
+
+        <Pagination
+            color='primary'
+            count={pageCount}
+            page={page + 1}
+            showFirstButton
+            showLastButton
+            onChange={(event, value) => apiRef.current.setPage(value - 1)}
         />
-      </div>
 
-      <div>
-        <Select
-          size='small'
-          value={pageSize}
-          label='Кол-во'
-          onChange={(e: any) => {
-            setPageSize(e.target.value);
-            apiRef.current.setPageSize(e.target.value);
-          }}
-        >
-          <MenuItem value={20}>20</MenuItem>
-          <MenuItem value={50}>50</MenuItem>
-          <MenuItem value={100}>100</MenuItem>
-        </Select>
-      </div>
-
-      <Pagination
-        color='primary'
-        count={pageCount}
-        page={page + 1}
-        showFirstButton
-        showLastButton
-        onChange={(event, value) => apiRef.current.setPage(value - 1)}
-      />
-
-      <span>
+        <span>
         Страница {page + 1} из {pageCount}
       </span>
-    </>
+      </>
   );
 }
 
 function CustomToolbar() {
   return (
-    <GridToolbarContainer>
-      <GridToolbarColumnsButton />
-      <GridToolbarFilterButton />
-      <GridToolbarDensitySelector />
-      <GridToolbarExport csvOptions={{ utf8WithBom: true, delimiter: ';' }} />
-    </GridToolbarContainer>
+      <GridToolbarContainer>
+        <GridToolbarColumnsButton />
+        <GridToolbarFilterButton />
+        <GridToolbarDensitySelector />
+        <GridToolbarExport csvOptions={{ utf8WithBom: true, delimiter: ';' }} />
+      </GridToolbarContainer>
   );
 }
 
@@ -223,7 +267,6 @@ const VisitorsGrid = () => {
   const [offset, setOffset] = useState<number>(0);
   const [maxUsers, setMaxUsers] = useState(0);
   const [loading, setLoading] = useState<boolean>(true);
-
   let [clients, setClients] = useState<IClient[]>([]);
 
   const { user, setEditUser } = useGlobalContext();
@@ -239,28 +282,28 @@ const VisitorsGrid = () => {
 
   useEffect(() => {
     user?.roles.map((item) =>
-      item.authorities.map((authItem) => {
-        if (authItem.authority_kod === 'users') {
-          // console.log({ authItem });
-          setCanReadLogs(true);
-          authItem.authority_fields.map((fieldItem) => {
-            // console.log({ fieldItem });
-            if (
-              fieldItem.field_kod === 'ACTIV' &&
-              fieldItem.field_value.includes('1')
-            ) {
-              setCanAddUser(true);
-              setCanEditUser(true);
-            }
-            if (
-              fieldItem.field_kod === 'ACTIV' &&
-              fieldItem.field_value.includes('2')
-            ) {
-              setCanEditUser(true);
-            }
-          });
-        }
-      })
+        item.authorities.map((authItem) => {
+          if (authItem.authority_kod === 'users') {
+            // console.log({ authItem });
+            setCanReadLogs(true);
+            authItem.authority_fields.map((fieldItem) => {
+              // console.log({ fieldItem });
+              if (
+                  fieldItem.field_kod === 'ACTIV' &&
+                  fieldItem.field_value.includes('1')
+              ) {
+                setCanAddUser(true);
+                setCanEditUser(true);
+              }
+              if (
+                  fieldItem.field_kod === 'ACTIV' &&
+                  fieldItem.field_value.includes('2')
+              ) {
+                setCanEditUser(true);
+              }
+            });
+          }
+        })
     );
   }, [user]);
 
@@ -273,8 +316,8 @@ const VisitorsGrid = () => {
     filteredColumn.map((cs: any) => {
       if (cs.hide === true) return;
       if (
-        cs.key.toLowerCase() === 'date_created' ||
-        cs.key.toLowerCase() === 'date_updated'
+          cs.key.toLowerCase() === 'date_created' ||
+          cs.key.toLowerCase() === 'date_updated'
       ) {
         stateColumn.push({
           field: cs.key.toLowerCase(),
@@ -282,7 +325,7 @@ const VisitorsGrid = () => {
           width: cs.width,
           hide: cs.hide,
           renderCell: (params: any) => (
-            <span>{moment(params.value).format('DD.MM.YYYY  hh:mm:ss')}</span>
+              <span>{moment(params.value).format('DD.MM.YYYY  hh:mm:ss')}</span>
           ),
           // hide: true,
         });
@@ -293,7 +336,7 @@ const VisitorsGrid = () => {
           width: cs.width,
           hide: cs.hide,
           renderCell: (params: any) => (
-            <span>{moment(params.value).format('DD.MM.YYYY')}</span>
+              <span>{moment(params.value).format('DD.MM.YYYY')}</span>
           ),
           // hide: true,
         });
@@ -340,7 +383,7 @@ const VisitorsGrid = () => {
     const column = await columnsReq.json();
     // console.log(column);
     const filteredColumn = column?.clmns.filter(
-      (item: any) => item.keyTable === 'folk'
+        (item: any) => item.keyTable === 'folk'
     );
 
     // console.log({ column });
@@ -350,6 +393,7 @@ const VisitorsGrid = () => {
       {
         field: 'action',
         headerName: 'Действия',
+        width: 160, //test
         sortable: false,
         renderCell: (params: any) => {
           const editFolk = (e: any) => {
@@ -395,17 +439,17 @@ const VisitorsGrid = () => {
           }
 
           return (
-            <>
-              <IconButton aria-label='Редактировать' onClick={editFolk}>
-                <EditIcon />
-              </IconButton>
-              <IconButton aria-label='Удалить' onClick={deleteFolk}>
-                <DeleteIcon />
-              </IconButton>
-              <IconButton aria-label='Тиражирование' onClick={replication}>
-                <ArrowOutwardIcon />
-              </IconButton>
-            </>
+              <>
+                <IconButton aria-label='Редактировать' onClick={editFolk}>
+                  <EditIcon />
+                </IconButton>
+                <IconButton aria-label='Удалить' onClick={deleteFolk}>
+                  <DeleteIcon />
+                </IconButton>
+                <IconButton aria-label='Тиражирование' onClick={replication}>
+                  <ArrowOutwardIcon />
+                </IconButton>
+              </>
           );
         },
       },
@@ -417,54 +461,68 @@ const VisitorsGrid = () => {
     setMaxUsers(data.allcnt);
   };
 
-  console.log({ columns });
+  const onRowsSelectionHandler = (ids) => {
+    selectedBox = [];
+    ids.forEach(id => {
+      selectedBox.push(clients.find(el => el.id === id));
+    })
+  };
+
+  // Update
+  const updateAfterRemoveCheckboxes = () => {
+    for (let i = 0; i < selectedBox.length; i++) {
+      clients = clients.filter(el => (el.personid !== selectedBox[i].personid));
+      setClients(clients);
+    }
+  }
 
   return (
-    <>
-      <PanelAndFilter canAddUser={canAddUser} />
+      <>
+        <PanelAndFilter canAddUser={canAddUser} updateAfterRemoveCheckboxes={updateAfterRemoveCheckboxes} />
 
-      {/* style={{ height: '80vh' }} */}
-      <div style={{ height: '80vh' }}>
-        <DataGridPro
-          rows={clients}
-          columns={columns}
-          pageSize={pageSize}
-          // autoHeight
-          loading={loading}
-          localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          onPageChange={(newPage) => setPage(newPage)}
-          // getRowId={(row) => row.id}
+        {/* style={{ height: '80vh' }} */}
+        <div style={{ height: '80vh' }}>
+          <DataGridPro
+              rows={clients}
+              onSelectionModelChange={(ids) => onRowsSelectionHandler(ids)}
+              columns={columns}
+              pageSize={pageSize}
+              // autoHeight
+              loading={loading}
+              localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
+              onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+              onPageChange={(newPage) => setPage(newPage)}
+              // getRowId={(row) => row.id}
 
-          // Для работы фильтра выше 100, в корневой папке node_modules необходимо изменить содержание по примеру ниже:
-          // node_modules/@mui/x-data-grid/DataGrid/useDataGridProps.d.ts; Строчка 3, значение 100 изменить на 500
-          // node_modules/@mui/x-data-grid/DataGrid/useDataGridProps.js; Строчка 19, значение 100 изменить на 500
-          rowsPerPageOptions={[20, 50, 100, 200, 500]}
-          checkboxSelection
-          disableSelectionOnClick
-          components={{ Toolbar: CustomToolbar, Pagination: CustomPagination }}
-          componentsProps={
-            {
-              // pagination: {
-              //   labelRowsPerPage: 'Количество на странице',
-              //   labelDisplayedRows: ({ from, to, count, page }: any) => {
-              //     return `Страница ${page + 1} из ${Math.ceil(count / pageSize)}`;
-              //   },
-              //   // count: 1,
-              //   // page: 0,
-              //   // component: 'div', // here
-              //   // onPageChange: () => {},
-              //   // onRowsPerPageChange: () => {},
-              //   // nextIconButtonProps: {
-              //   //   disabled: true,
-              //   // },
-              // },
-            }
-          }
-        />
-      </div>
-      <ModalEdit func={getFolks}/>
-    </>
+              // Для работы фильтра выше 100, в корневой папке node_modules необходимо изменить содержание по примеру ниже:
+              // node_modules/@mui/x-data-grid/DataGrid/useDataGridProps.d.ts; Строчка 3, значение 100 изменить на 500
+              // node_modules/@mui/x-data-grid/DataGrid/useDataGridProps.js; Строчка 19, значение 100 изменить на 500
+              rowsPerPageOptions={[20, 50, 100, 200, 500]}
+              checkboxSelection
+              disableSelectionOnClick
+              components={{ Toolbar: CustomToolbar, Pagination: CustomPagination }}
+              componentsProps={
+                {
+                  // pagination: {
+                  //   labelRowsPerPage: 'Количество на странице',
+                  //   labelDisplayedRows: ({ from, to, count, page }: any) => {
+                  //     return `Страница ${page + 1} из ${Math.ceil(count / pageSize)}`;
+                  //   },
+                  //   // count: 1,
+                  //   // page: 0,
+                  //   // component: 'div', // here
+                  //   // onPageChange: () => {},
+                  //   // onRowsPerPageChange: () => {},
+                  //   // nextIconButtonProps: {
+                  //   //   disabled: true,
+                  //   // },
+                  // },
+                }
+              }
+          />
+        </div>
+        <ModalEdit func={getFolks}/>
+      </>
   );
 };
 

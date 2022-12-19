@@ -18,32 +18,37 @@ export default async function handler(
 ) {
   const { login, password, pid } = req.body.data;
 
-  let loginHeaders = new Headers();
-  loginHeaders.append('Content-Length', '10000');
-  loginHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
-  loginHeaders.append(
-    'Authorization',
-    'Basic ' + Buffer.from(login + ':' + password, 'binary').toString('base64')
-  );
+  // let loginHeaders = new Headers();
+  // loginHeaders.append('Content-Length', '10000');
+  // loginHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
+  // loginHeaders.append(
+  //   'Authorization',
+  //   'Basic ' + Buffer.from(login + ':' + password, 'binary').toString('base64')
+  // );
+  //
+  // //Это сделано для локального хоста, вообще внутри сети или внутри одного сервера это будет лишним
+  // const httpsAgent = new https.Agent({
+  //   rejectUnauthorized: false,
+  // });
+  //
+  // let requestOptions: IReqOption = {
+  //   method: 'DELETE',
+  //   headers: loginHeaders,
+  //   body: '',
+  //   // redirect: 'follow',
+  //   // agent: httpsAgent,
+  // };
 
-  //Это сделано для локального хоста, вообще внутри сети или внутри одного сервера это будет лишним
-  const httpsAgent = new https.Agent({
-    rejectUnauthorized: false,
-  });
-
-  let requestOptions: IReqOption = {
-    method: 'DELETE',
-    headers: loginHeaders,
-    body: '',
-    redirect: 'follow',
-    agent: httpsAgent,
-  };
-
-  console.log(requestOptions)
 
   await fetch(
     `https://uface.su/persident/processfolk?pid=${pid}`,
-    requestOptions
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "authorization": 'Basic ' + Buffer.from(login + ':' + password, 'binary').toString('base64')
+        }
+      }
   )
     .then((response) => response.text())
     .then((result) => {

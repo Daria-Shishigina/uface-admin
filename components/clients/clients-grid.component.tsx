@@ -14,15 +14,23 @@ import {
   GridToolbarDensitySelector,
   GridToolbarFilterButton,
 } from '@mui/x-data-grid-pro';
+
+import {DataGrid} from '@mui/x-data-grid';
+
 import {
+  Box,
   IconButton,
   MenuItem,
   Pagination,
   Select,
   TextField,
+  Button,
+  SelectChangeEvent
 } from '@mui/material';
+import FormHelperText from '@mui/material/FormHelperText';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import InputLabel from '@mui/material/InputLabel';
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 
 import LoadingSpin from 'react-loading-spin';
@@ -34,6 +42,11 @@ import { useGlobalContext } from 'context/global';
 import ModalEdit from 'components/modal-edit/modal-edit.component';
 import styled from 'styled-components';
 import moment from 'moment';
+import Modal from "@mui/material/Modal";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import {useQuery} from "react-query";
+import CopyAccsToTerminals from "../../pages/api/CopyAccsToTerminals";
 
 export interface IClient {
   dateborn: string;
@@ -62,6 +75,14 @@ export interface IPhoto {
   faceid: string;
 }
 
+const style = {
+  position: 'absolute' as 'absolute',
+  top: '5%',
+  left: '35%',
+  width: '30%',
+  height: '50%',
+};
+
 const PanelStyles = styled.div`
   display: flex;
   width: 100%;
@@ -82,8 +103,9 @@ const PanelStyles = styled.div`
 `;
 
 let selectedBox = [];
+let terminalsSelectedBox = [];
 
-const PanelAndFilter = ({ canAddUser, updateAfterRemoveCheckboxes }: { canAddUser: boolean, updateAfterRemoveCheckboxes: any }) => {
+const PanelAndFilter = ({ canAddUser, handleOpen, updateAfterRemoveCheckboxes }: { canAddUser: boolean, updateAfterRemoveCheckboxes: any }) => {
   const { setEditUser } = useGlobalContext();
 
   return (
@@ -121,7 +143,7 @@ const PanelAndFilter = ({ canAddUser, updateAfterRemoveCheckboxes }: { canAddUse
         {canAddUser && (
             <button
                 type='button'
-                onClick={() => massReplication()}
+                onClick={() => handleOpen()}
             >
               Массовое тиражирование
             </button>
@@ -141,6 +163,7 @@ const PanelAndFilter = ({ canAddUser, updateAfterRemoveCheckboxes }: { canAddUse
 };
 
 function massReplication() {
+  if (selectedBox.length === 0) return alert('Выберите пользователей')
   let login = sessionStorage.getItem('login');
   let password = sessionStorage.getItem('password');
   for (let i = 0; i < selectedBox.length; i++) {
@@ -159,6 +182,7 @@ function massReplication() {
  * Massive remove
  */
 function massRemove(updateAfterRemoveCheckboxes) {
+  if (selectedBox.length === 0) return alert('Выберите пользователей')
   let login = sessionStorage.getItem('login');
   let password = sessionStorage.getItem('password');
   for (let i = 0; i < selectedBox.length; i++) {
@@ -267,6 +291,12 @@ const VisitorsGrid = () => {
   const [offset, setOffset] = useState<number>(0);
   const [maxUsers, setMaxUsers] = useState(0);
   const [loading, setLoading] = useState<boolean>(true);
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => {
+    if (selectedBox.length === 0) return alert('Выберите пользователей')
+    setOpen(true);
+  }
+  const handleClose = () => setOpen(false);
   let [clients, setClients] = useState<IClient[]>([]);
 
   const { user, setEditUser } = useGlobalContext();
@@ -274,6 +304,7 @@ const VisitorsGrid = () => {
   const [canReadLogs, setCanReadLogs] = useState(false);
   const [canEditUser, setCanEditUser] = useState(false);
   const [canAddUser, setCanAddUser] = useState(false);
+  const [replicationType, setReplicationType] = React.useState('CopyAccsToTerminals');
 
   // Алексей Давыдулин, [4 Jun 2022, 10:29:32 PM]:
   // 3 - это просмотр
@@ -351,6 +382,20 @@ const VisitorsGrid = () => {
     });
 
     return stateColumn;
+  };
+
+  let stateTColumn: any[] = [];
+  const getFormatedTColumn = (filteredColumn: any[]) => {
+    filteredColumn.map((cs: any) => {
+      stateTColumn.push({
+        field: cs.key,
+        headerName: cs.nameColumn,
+        width: cs.width,
+        hide: cs.hide,
+      });
+    });
+
+    return stateTColumn;
   };
 
   //Получить список пользователей
@@ -461,10 +506,54 @@ const VisitorsGrid = () => {
     setMaxUsers(data.allcnt);
   };
 
+  const [tcolumns, setTcolumns] = useState<any[]>([]);
+  const { status, data: terminalsData, error, isFetching } = useQuery(
+      'terminals',
+      async () => {
+        let login = sessionStorage.getItem('login');
+        let password = sessionStorage.getItem('password');
+
+        const res = await fetch('/api/getTerminals', {
+          method: 'POST',
+          body: JSON.stringify({login, password}),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }); //.then((result) => result.json());
+        const resData = await res.json();
+
+        const columnsReq = await fetch('/api/column-names', {
+          method: 'POST',
+          body: JSON.stringify({login, password}),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        const column = await columnsReq.json();
+        console.log({column});
+        const filteredColumn = column?.clmns.filter(
+            (item: any) => item.keyTable === 'terminals'
+        );
+
+        const formated = getFormatedTColumn(filteredColumn);
+        setTcolumns(formated);
+        console.log({resData});
+        return resData.terms;
+        // return res.terms;
+      }
+  );
+
   const onRowsSelectionHandler = (ids) => {
     selectedBox = [];
     ids.forEach(id => {
       selectedBox.push(clients.find(el => el.id === id));
+    })
+  };
+
+  const onTerminalsSelectionHandler = (ids) => {
+    terminalsSelectedBox = [];
+    ids.forEach(id => {
+      terminalsSelectedBox.push(terminalsData.find(el => el.id === id));
     })
   };
 
@@ -476,12 +565,80 @@ const VisitorsGrid = () => {
     }
   }
 
+  const changeReplicationType = (event: SelectChangeEvent) => {
+    setReplicationType(event.target.value);
+  };
+
+  async function submitMassReplication() {
+    if (terminalsSelectedBox.length === 0) return alert('Выберите терминал');
+    let login = sessionStorage.getItem('login');
+    let password = sessionStorage.getItem('password');
+    for (let i = 0; i < selectedBox.length; i++) {
+      for (let s = 0; s < terminalsSelectedBox.length; s++) {
+        let terminalUri = `http://${terminalsSelectedBox[s].ip}:${terminalsSelectedBox[s].port}`;
+        let uri = `/api/${replicationType}`;
+        let reqParam = {login, password, personid: selectedBox[i].personid, terminal: terminalUri};
+        fetch(uri, {
+          method: 'POST',
+          body: JSON.stringify({data: reqParam}),
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+      }
+    }
+    handleClose();
+  }
+
   return (
       <>
-        <PanelAndFilter canAddUser={canAddUser} updateAfterRemoveCheckboxes={updateAfterRemoveCheckboxes} />
 
-        {/* style={{ height: '80vh' }} */}
+        <PanelAndFilter canAddUser={canAddUser} handleOpen={handleOpen} updateAfterRemoveCheckboxes={updateAfterRemoveCheckboxes} />
+
         <div style={{ height: '80vh' }}>
+          <Modal
+              open={open}
+              onClose={handleClose}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+          >
+            <Box sx={{...style}} style={{backgroundColor: 'white'}}>
+              <h2 id="parent-modal-title" style={{marginLeft: '20px'}}>Список терминалов</h2><hr/>
+              <div>
+                <Select
+                    labelId="demo-simple-select-helper-label"
+                    id="demo-simple-select-helper"
+                    value={replicationType}
+                    onChange={changeReplicationType}
+                    style={{width: '100%'}}
+                >
+                  <MenuItem value={'CopyAccsToTerminals'}>Тиражирование без фото</MenuItem>
+                  <MenuItem value={'EditAccsToTerminals'}>Тиражирование без фото (изменение данных)</MenuItem>
+                  <MenuItem value={'CopyAccsFacesToTerminals'}>Тиражирование с фото</MenuItem>
+                  <MenuItem value={'EditAccsFacesToTerminals'}>Тиражирование с фото (изменение данных)</MenuItem>
+                </Select>
+                <FormHelperText>Тип тиражирования</FormHelperText>
+              </div><br/>
+
+
+
+              <DataGrid
+                  style={{backgroundColor: 'white'}}
+                  rows={terminalsData}
+                  columns={tcolumns}
+                  localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
+                  checkboxSelection
+                  onSelectionModelChange={(ids) => onTerminalsSelectionHandler(ids)}
+                  disableSelectionOnClick
+                />
+                <div style={{backgroundColor: 'white'}}>
+                  <Grid container justifyContent="flex-end">
+                    <Button variant="contained" onClick={(_) => submitMassReplication()}>Подтвердить</Button>
+                  </Grid>
+                </div>
+            </Box>
+          </Modal>
+
           <DataGridPro
               rows={clients}
               onSelectionModelChange={(ids) => onRowsSelectionHandler(ids)}

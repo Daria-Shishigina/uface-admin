@@ -118,7 +118,7 @@ function MenuList({ t, l, close }: IList) {
           close();
           logoutHandler();
         }}
-        onMouseLeave={close}
+        // onMouseLeave={close}
       >
         <span>Выйти</span>
       </ListItem>

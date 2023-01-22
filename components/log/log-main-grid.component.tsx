@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   DataGridPro,
   GridColDef,
@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 const style = {
   position: 'absolute' as 'absolute',
   top: '15%',
-  left: '40%',
+  left: '35%',
   width: '30%',
   height: '70%',
 };
@@ -21,6 +21,7 @@ const style = {
 import { IStudent } from './log-list.interfaces';
 import { useQuery } from 'react-query';
 import moment from 'moment';
+import Grid from '@mui/material/Grid';
 import { Box } from '@mui/material';
 import {
   GridToolbarColumnsButton,
@@ -43,7 +44,6 @@ function CustomToolbar() {
 let stateColumn: any[] = [];
 const getFormatedColumn = (filteredColumn: any[]) => {
   stateColumn = [];
-  console.log({ filteredColumn });
   filteredColumn.map((cs: any) => {
     //temperatureState valueFormatter: ({ value }) => `${value} °C`
     if (cs.key === 'dt_log') {
@@ -96,12 +96,13 @@ const LogMainGrid = () => {
   const [open, setOpen] = useState(false);
   const [imgsrc, setImgsrc] = useState('https://upload.wikimedia.org/wikipedia/commons/5/59/Empty.png?20091205084734');
   const handleOpen = (params: any) => {
+    console.log(params)
     setImgsrc(params);
     setOpen(true);
   }
   const handleClose = () => setOpen(false);
 
-  if (maxRetry === 3) return false; // TODO ???
+  // if (maxRetry === 3) return false; // TODO ???
 
   const getLogs = async () => {
     let login = sessionStorage.getItem('login');
@@ -124,11 +125,9 @@ const LogMainGrid = () => {
     });
 
     const column = await columnsReq.json();
-
     const filteredColumn = column.clmns.filter(
-      (item: any) => item.keyTable === 'log_identify'
+      (item: any) => ((item.keyTable === 'log_identify') && (item.hide === false))
     );
-
     const formated = getFormatedColumn(filteredColumn);
     // formated.push();
     const formatedWithImage = [
@@ -142,7 +141,7 @@ const LogMainGrid = () => {
             src={params.value}
             alt='Фото проходки'
             style={{ height: '100%', margin: 'auto' }}
-            onClick={() => handleOpen(params.value)}
+            onClick={() => handleOpen(params)}
           />
         ),
       },
@@ -160,6 +159,7 @@ const LogMainGrid = () => {
   const { status, data, error, isFetching } = useQuery(
     'lastEnteredFullList',
     async () => {
+      console.log(new Date())
       let login = sessionStorage.getItem('login');
       let password = sessionStorage.getItem('password');
       const res = await fetch('/api/getLogRecognition', {
@@ -182,7 +182,7 @@ const LogMainGrid = () => {
     },
     {
       // Время повторного запроса: 1 сек = 1 • 1000мс
-      // refetchInterval: 1000,
+      refetchInterval: 5000,
     }
   );
 
@@ -198,13 +198,24 @@ const LogMainGrid = () => {
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            <img
-                src={imgsrc}
-                style={{ height: '100%', margin: 'auto' }}
-            />
-          </Typography>
+        <Box sx={{...style}} style={{backgroundColor: 'white'}}>
+          <h2 id="parent-modal-title" style={{marginLeft: '20px'}}>Пользователь Х</h2><hr/>
+          <Grid container>
+            <Grid item xs={6} style={{marginLeft: '20px'}}>
+              <img src = {imgsrc.value} style={{height: '100%', margin: 'auto', width: '100%'}}/>
+            </Grid>
+            <Grid item xs={5} style={{marginLeft: '20px'}}>
+              <Typography sx={{ wordBreak: "break-word" }}>
+                ФИО: {imgsrc?.row?.fio || null}
+              </Typography><br/>
+              <Typography sx={{ wordBreak: "break-word" }}>
+                Дата распознования: {imgsrc?.row?.dt_log || null}
+              </Typography><br/>
+              <Typography sx={{ wordBreak: "break-word" }}>
+                Телефон: soon
+              </Typography>
+            </Grid>
+          </Grid>
         </Box>
       </Modal>
       <Box

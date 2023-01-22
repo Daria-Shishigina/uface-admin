@@ -708,6 +708,27 @@ const ModalEdit = ({func}: any) => {
                 </div>
                 <div className='form-row'>
                   <div className='form-group col'>
+                    <label>Изменить пароль</label>
+                    <input
+                        // @ts-ignore
+                        name='pwd'
+                        type='text'
+                        {...register('password')}
+                        className={`form-control ${
+                            errors.password ? 'is-invalid' : ''
+                        }`}
+                    />
+                    <div className='invalid-feedback'>
+                      {errors.password?.message}
+                    </div>
+                    {/*<button type='submit' className='btn btn-primary btn-sm' style={{marginTop: "10px", float: 'right'}}>*/}
+                    {/*  {'Подтвердить'}*/}
+                    {/*</button>*/}
+                  </div>
+                </div>
+                {/*style={{marginTop: '-30px'}}*/}
+                <div className='form-row'>
+                  <div className='form-group col'>
                     <label>Имя</label>
                     <input
                       // @ts-ignore
@@ -720,23 +741,6 @@ const ModalEdit = ({func}: any) => {
                     />
                     <div className='invalid-feedback'>
                       {errors.fname?.message}
-                    </div>
-                  </div>
-                </div>
-                <div className='form-row'>
-                  <div className='form-group col'>
-                    <label>Изменить пароль</label>
-                    <input
-                        // @ts-ignore
-                        name='password'
-                        type='text'
-                        {...register('password')}
-                        className={`form-control ${
-                            errors.password ? 'is-invalid' : ''
-                        }`}
-                    />
-                    <div className='invalid-feedback'>
-                      {errors.password?.message}
                     </div>
                   </div>
                 </div>

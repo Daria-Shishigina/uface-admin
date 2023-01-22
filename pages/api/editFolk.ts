@@ -32,12 +32,12 @@ export default async function handler(
     phone_approve,
     vuz_kod,
     activated,
+    pwd
   } = req.body.data;
 
   // console.log(req.body.data);
 
   const pid = personid;
-
   const folk = {
     institute: vuz_kod,
     folkrole: role_kod,
@@ -49,9 +49,8 @@ export default async function handler(
     phone: phone,
     email: email,
     phone_approve: phone_approve,
-    activated: activated,
+    activated: activated
   };
-
   let loginHeaders = new Headers();
   loginHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
   loginHeaders.append(
@@ -62,6 +61,7 @@ export default async function handler(
 
   urlencoded.append('pid', pid);
   urlencoded.append('folk', JSON.stringify(folk));
+  urlencoded.append('pwd', pwd);
 
   //Это сделано для локального хоста, вообще внутри сети или внутри одного сервера это будет лишним
   const httpsAgent = new https.Agent({
@@ -80,6 +80,7 @@ export default async function handler(
   await fetch('https://uface.su/persident/processfolk', requestOptions)
     .then((response) => response.text())
     .then((result) => {
+      console.log(123)
       res.status(200).json(result);
       console.log(result);
     })

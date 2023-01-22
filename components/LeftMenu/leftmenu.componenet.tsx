@@ -47,8 +47,8 @@ const LeftMenuComponent = () => {
 
   return user?.status === 'success' && router.pathname !== '/login' ? (
     <LeftMenuContainer id="sidebar" open={isOpen}
-       onMouseLeave={() => {setOpen(false);}}
-        onMouseOver={() => {setOpen(true);}}
+       // onMouseLeave={() => {setOpen(false);}}
+       //  onMouseOver={() => {setOpen(true);}}
     >
       <Logo open={isOpen}>
         <Link href='/dashboard'>

@@ -320,13 +320,13 @@ function LogStudentsMonitoring({}) {
             </div>
           )}
         </LastEntered>
-        <div>
-          <h4>Навигация:</h4>
-          <NavigationGrid>
-            <ButtonToPage title='Пользователи' linkPart='persons' />
-            <ButtonToPage title='Терминалы' linkPart='terminals' />
-          </NavigationGrid>
-        </div>
+        {/*<div>*/}
+        {/*  <h4>Навигация:</h4>*/}
+        {/*  <NavigationGrid>*/}
+        {/*    <ButtonToPage title='Пользователи' linkPart='persons' />*/}
+        {/*    <ButtonToPage title='Терминалы' linkPart='terminals' />*/}
+        {/*  </NavigationGrid>*/}
+        {/*</div>*/}
       </TopGrid>
       <div>
         <div className='grid-head'>

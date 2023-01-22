@@ -29,13 +29,13 @@ export default async function handler(
   );
   let urlencoded = new URLSearchParams();
 
-  console.log({ personid });
+
 
   urlencoded.append('personId', personid);
-  // if (terminal !== '') {
-  //   urlencoded.append('terminal', terminal);
-  // }
-
+  if (terminal !== '') {
+    urlencoded.append('terminal', terminal);
+  }
+  // console.log(urlencoded);
   //Это сделано для локального хоста, вообще внутри сети или внутри одного сервера это будет лишним
   const httpsAgent = new https.Agent({
     rejectUnauthorized: false,
@@ -53,6 +53,7 @@ export default async function handler(
   await fetch('https://uface.su/persident/copyaccstoterminals', requestOptions)
     .then((response) => response.text())
     .then((result) => {
+      // console.log(result)
       res.status(200).json(JSON.parse(result));
     })
     .catch((error) => console.log('error', error));

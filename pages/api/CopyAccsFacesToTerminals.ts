@@ -32,9 +32,9 @@ export default async function handler(
   console.log({ personid });
 
   urlencoded.append('personId', personid);
-  // if (terminal !== '') {
-  //   urlencoded.append('terminal', terminal);
-  // }
+  if (terminal !== '') {
+    urlencoded.append('terminal', terminal);
+  }
 
   //Это сделано для локального хоста, вообще внутри сети или внутри одного сервера это будет лишним
   const httpsAgent = new https.Agent({

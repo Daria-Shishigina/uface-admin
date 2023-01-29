@@ -30,7 +30,7 @@ export default async function handler(
   let urlencoded = new URLSearchParams();
 
   urlencoded.append('personId', personid);
-  if (terminal !== '') {
+  if (terminal !== undefined) {
     urlencoded.append('terminal', terminal);
   }
 

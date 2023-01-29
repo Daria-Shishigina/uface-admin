@@ -16,7 +16,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { login, password, limit, offset } = req.body.user;
+  const { login, password, limit, offset, pid } = req.body.user;
 
   let loginHeaders = new Headers();
   loginHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -33,6 +33,7 @@ export default async function handler(
   let urlencoded = new URLSearchParams();
   urlencoded.append('limit', limit);
   urlencoded.append('offset', offset);
+  if (pid !== undefined) urlencoded.append('pid', pid);
 
   let requestOptions: IReqOption = {
     method: 'POST',

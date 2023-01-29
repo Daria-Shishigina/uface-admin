@@ -713,7 +713,7 @@ const ModalEdit = ({func}: any) => {
                         // @ts-ignore
                         name='pwd'
                         type='text'
-                        {...register('password')}
+                        {...register('pwd')}
                         className={`form-control ${
                             errors.password ? 'is-invalid' : ''
                         }`}
@@ -721,9 +721,9 @@ const ModalEdit = ({func}: any) => {
                     <div className='invalid-feedback'>
                       {errors.password?.message}
                     </div>
-                    {/*<button type='submit' className='btn btn-primary btn-sm' style={{marginTop: "10px", float: 'right'}}>*/}
-                    {/*  {'Подтвердить'}*/}
-                    {/*</button>*/}
+                    <button type='submit' className='btn btn-primary btn-sm' style={{marginTop: "10px", float: 'right'}}>
+                      {'Подтвердить'}
+                    </button>
                   </div>
                 </div>
                 {/*style={{marginTop: '-30px'}}*/}

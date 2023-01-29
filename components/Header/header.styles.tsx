@@ -32,11 +32,13 @@ export const UserHeader = styled.div<IUserHeader>`
   justify-content: center;
   align-items: center;
   gap: 7px;
-
+/*
   cursor: pointer;
+  */
   padding: 0.3em;
 
   transition: 0.3s cubic-bezier(0.77, 0, 0.175, 1);
+  /*
   &:hover {
     background-color: #ccc;
   }
@@ -44,7 +46,37 @@ export const UserHeader = styled.div<IUserHeader>`
   &.active {
     background-color: #ccc;
   }
+  */
 `;
+
+export const IconMain = styled.div`
+<style>
+a:link {
+  color: #000000;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #000000;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #000000;
+  background-color: transparent;
+  text-decoration: underline;
+}
+
+a:active {
+  color: #000000;
+  background-color: transparent;
+  text-decoration: underline;
+}
+</style>
+`
+
 
 export const UserPicture = styled.div`
   display: flex;

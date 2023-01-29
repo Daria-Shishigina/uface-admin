@@ -13,8 +13,8 @@ import Typography from '@mui/material/Typography';
 const style = {
   position: 'absolute' as 'absolute',
   top: '15%',
-  left: '35%',
-  width: '30%',
+  left: '20%',
+  width: '60%',
   height: '70%',
 };
 
@@ -95,14 +95,30 @@ const LogMainGrid = () => {
 
   const [open, setOpen] = useState(false);
   const [imgsrc, setImgsrc] = useState('https://upload.wikimedia.org/wikipedia/commons/5/59/Empty.png?20091205084734');
-  const handleOpen = (params: any) => {
-    console.log(params)
-    setImgsrc(params);
+
+  const handleOpen = async (params: any) => {
+    let login = sessionStorage.getItem('login');
+    let password = sessionStorage.getItem('password');
+    let pid = params.row.personId;
+    const user = {login, password, pid};
+    const folks = await fetch('/api/folks', {
+      method: 'POST',
+      body: JSON.stringify({ user }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const dataFolks = await folks.json();
+    setImgsrc({
+      value: params.value,
+      fio: dataFolks?.folks?.[0]?.fio,
+      phone: dataFolks?.folks?.[0]?.phone,
+      dt_log: params?.row?.dt_log,
+      dateborn: dataFolks?.folks?.[0]?.dateborn
+    });
     setOpen(true);
   }
   const handleClose = () => setOpen(false);
-
-  // if (maxRetry === 3) return false; // TODO ???
 
   const getLogs = async () => {
     let login = sessionStorage.getItem('login');
@@ -199,20 +215,24 @@ const LogMainGrid = () => {
           aria-describedby="modal-modal-description"
       >
         <Box sx={{...style}} style={{backgroundColor: 'white'}}>
-          <h2 id="parent-modal-title" style={{marginLeft: '20px'}}>Пользователь Х</h2><hr/>
+          <h2 id="parent-modal-title" style={{marginLeft: '20px'}}>Пользователь</h2>
+          <hr/>
           <Grid container>
             <Grid item xs={6} style={{marginLeft: '20px'}}>
-              <img src = {imgsrc.value} style={{height: '100%', margin: 'auto', width: '100%'}}/>
+              <img src = {imgsrc.value} style={{height: '80%', width: '80%'}}/>
             </Grid>
             <Grid item xs={5} style={{marginLeft: '20px'}}>
               <Typography sx={{ wordBreak: "break-word" }}>
-                ФИО: {imgsrc?.row?.fio || null}
+                ФИО: {imgsrc?.fio || null}
               </Typography><br/>
               <Typography sx={{ wordBreak: "break-word" }}>
-                Дата распознования: {imgsrc?.row?.dt_log || null}
+                Дата распознования: {imgsrc?.dt_log || null}
               </Typography><br/>
               <Typography sx={{ wordBreak: "break-word" }}>
-                Телефон: soon
+                Телефон: {imgsrc?.phone || null}
+              </Typography><br/>
+              <Typography sx={{ wordBreak: "break-word" }}>
+                Дата рождения: {imgsrc?.dateborn || null}
               </Typography>
             </Grid>
           </Grid>

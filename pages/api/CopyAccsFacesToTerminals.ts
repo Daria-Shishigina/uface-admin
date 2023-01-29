@@ -32,7 +32,7 @@ export default async function handler(
   console.log({ personid });
 
   urlencoded.append('personId', personid);
-  if (terminal !== '') {
+  if (terminal !== undefined) {
     urlencoded.append('terminal', terminal);
   }
 

@@ -49,8 +49,10 @@ export default async function handler(
     phone: phone,
     email: email,
     phone_approve: phone_approve,
-    activated: activated
+    activated: activated,
+    pwd: pwd
   };
+  console.log(pwd)
   let loginHeaders = new Headers();
   loginHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
   loginHeaders.append(

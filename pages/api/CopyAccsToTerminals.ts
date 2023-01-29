@@ -32,7 +32,8 @@ export default async function handler(
 
 
   urlencoded.append('personId', personid);
-  if (terminal !== '') {
+  console.log(terminal)
+  if (terminal !== undefined) {
     urlencoded.append('terminal', terminal);
   }
   // console.log(urlencoded);
@@ -53,7 +54,6 @@ export default async function handler(
   await fetch('https://uface.su/persident/copyaccstoterminals', requestOptions)
     .then((response) => response.text())
     .then((result) => {
-      // console.log(result)
       res.status(200).json(JSON.parse(result));
     })
     .catch((error) => console.log('error', error));

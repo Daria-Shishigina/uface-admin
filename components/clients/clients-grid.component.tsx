@@ -109,6 +109,10 @@ const PanelAndFilter = ({ canAddUser, handleOpen, updateAfterRemoveCheckboxes }:
   const { setEditUser } = useGlobalContext();
 
   return (
+      <span>
+        <h2>
+          Пользователи
+        </h2>
       <PanelStyles>
         {canAddUser && (
             <button
@@ -159,6 +163,7 @@ const PanelAndFilter = ({ canAddUser, handleOpen, updateAfterRemoveCheckboxes }:
         )}
 
       </PanelStyles>
+      </span>
   );
 };
 
@@ -417,6 +422,8 @@ const VisitorsGrid = () => {
       },
     });
     const data = await res.json();
+    console.log(123321)
+    console.log(data)
 
     const columnsReq = await fetch('/api/column-names', {
       method: 'POST',

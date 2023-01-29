@@ -30,7 +30,7 @@ export default async function handler(
   let urlencoded = new URLSearchParams();
 
   urlencoded.append('personId', personid);
-  if (terminal !== '') {
+  if (terminal !== undefined) {
     urlencoded.append('terminal', terminal);
   }
 
@@ -52,7 +52,6 @@ export default async function handler(
     .then((response) => response.text())
     .then((result) => {
       res.status(200).json(result);
-      console.log(result);
     })
     .catch((error) => console.log('error', error));
 }

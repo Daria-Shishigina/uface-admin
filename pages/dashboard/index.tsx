@@ -17,6 +17,14 @@ import Moment from 'react-moment';
 import Link from 'next/link';
 import LogMainGrid from 'components/log/log-main-grid.component';
 import { CircularProgress } from '@mui/material';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import InsertChartIcon from '@mui/icons-material/InsertChartOutlined';
+import PeopleIcon from '@mui/icons-material/PeopleOutlined';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+
+import { Avatar, Card, CardContent, Typography } from '@mui/material';
+import MoneyIcon from '@mui/icons-material/Money';
 
 //interfaces
 interface IProps {}
@@ -279,55 +287,256 @@ function LogStudentsMonitoring({}) {
 
   return users?.length > 0 ? (
     <Container>
-      <TopGrid>
-        <LastEntered>
-          <div className='info-block'>
-            <h2>Последний вход</h2>
-            <div className='fio'>{users[0].FIO}</div>
-            <div className='terminal'>
-              <span className='title'>Устройство: </span>
-              <span>{users[0].title_terminal}</span>
-            </div>
-            <div className='date'>
-              <div>Дата входа:</div>
-              <Moment date={users[0]?.dt_log} subtract={{ hours: 12 }} format='DD.MM.YYYY HH:mm:ss' />
-            </div>
-          </div>
-          <img
-            src={users[0].image}
-            height={318}
-            alt='Изображение с терминала'
-          />
-          {photo !== '' ? (
-            <img
-              src={photo}
-              height={318}
-              style={{ marginLeft: 10 }}
-              alt='Изображение с терминала'
-            />
-          ) : (
-            <div
-              style={{
-                height: 318,
-                width: 200,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginLeft: 10,
-              }}
-            >
-              Нет в базе
-            </div>
-          )}
-        </LastEntered>
-        {/*<div>*/}
-        {/*  <h4>Навигация:</h4>*/}
-        {/*  <NavigationGrid>*/}
-        {/*    <ButtonToPage title='Пользователи' linkPart='persons' />*/}
-        {/*    <ButtonToPage title='Терминалы' linkPart='terminals' />*/}
-        {/*  </NavigationGrid>*/}
-        {/*</div>*/}
-      </TopGrid>
+      <Grid container spacing={6}>
+        <Grid item xs={8} md={8}>
+            <LastEntered>
+              <div className='info-block'>
+                <h2>Последний вход</h2>
+                <div className='fio'>{users[0].FIO}</div>
+                <div className='terminal'>
+                  <span className='title'>Устройство: </span>
+                  <span>{users[0].title_terminal}</span>
+                </div>
+                <div className='date'>
+                  <div>Дата входа:</div>
+                  <Moment date={users[0]?.dt_log} subtract={{ hours: 12 }} format='DD.MM.YYYY HH:mm:ss' />
+                </div>
+              </div>
+              <img
+                  src={users[0].image}
+                  height={318}
+                  alt='Изображение с терминала'
+              />
+              {photo !== '' ? (
+                  <img
+                      src={photo}
+                      height={318}
+                      style={{ marginLeft: 10 }}
+                      alt='Изображение с терминала'
+                  />
+              ) : (
+                  <div
+                      style={{
+                        height: 318,
+                        width: 200,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginLeft: 10,
+                      }}
+                  >
+                    Нет в базе
+                  </div>
+              )}
+            </LastEntered>
+            {/*<div>*/}
+            {/*  <h4>Навигация:</h4>*/}
+            {/*  <NavigationGrid>*/}
+            {/*    <ButtonToPage title='Пользователи' linkPart='persons' />*/}
+            {/*    <ButtonToPage title='Терминалы' linkPart='terminals' />*/}
+            {/*  </NavigationGrid>*/}
+            {/*</div>*/}
+        </Grid>
+        <Grid item xs={4} md={4}>
+          <Grid container spacing={5}>
+
+
+            <Grid item xs={6} md={6}>
+          <Card
+              sx={{ height: '80%' }}
+          >
+            <CardContent>
+              <Grid
+                  container
+                  spacing={3}
+                  sx={{ justifyContent: 'space-between' }}
+              >
+                <Grid item>
+                  <Typography
+                      color="textSecondary"
+                      gutterBottom
+                      variant="overline"
+                      fontSize={8}
+                  >
+                    Общее количество распознаваний (Сегодня)
+                  </Typography><br/><br/>
+                  <Grid container>
+                    <Grid sx={6} md={6}>
+                  <Typography
+                      color="textPrimary"
+                      //variant="h4"
+                      fontSize={14}
+                  >
+                    1
+                  </Typography>
+                    </Grid>
+                    <Grid sx={6} md={6}>
+                  <Avatar style={{float: 'right'}}
+                      sx={{
+                        backgroundColor: '#ee1445',
+                        height: 30,
+                        width: 30
+                      }}
+                  >
+                    <MoneyIcon />
+                  </Avatar>
+                    </Grid>
+                  </Grid>
+                </Grid>
+                <Grid item>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <Card
+                  sx={{ height: '80%' }}
+              >
+                <CardContent>
+                  <Grid
+                      container
+                      spacing={3}
+                      sx={{ justifyContent: 'space-between' }}
+                  >
+                    <Grid item>
+                      <Typography
+                          color="textSecondary"
+                          gutterBottom
+                          variant="overline"
+                          fontSize={8}
+                      >
+                        Общее количество устройств (Всего)
+                      </Typography><br/><br/>
+                      <Grid container>
+                        <Grid sx={6} md={6}>
+                          <Typography
+                              color="textPrimary"
+                              //variant="h4"
+                              fontSize={14}
+                          >
+                            1
+                          </Typography>
+                        </Grid>
+                        <Grid sx={6} md={6}>
+                          <Avatar style={{float: 'right'}}
+                                  sx={{
+                                    backgroundColor: 'success.main',
+                                    height: 30,
+                                    width: 30
+                                  }}
+                          >
+                            <PeopleIcon />
+                          </Avatar>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                    <Grid item>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item style={{marginTop: '-10%'}} xs={6} md={6}>
+              <Card
+                  sx={{ height: '80%' }}
+              >
+                <CardContent>
+                  <Grid
+                      container
+                      spacing={3}
+                      sx={{ justifyContent: 'space-between' }}
+                  >
+                    <Grid item>
+                      <Typography
+                          color="textSecondary"
+                          gutterBottom
+                          variant="overline"
+                          fontSize={8}
+                      >
+                        Количество распознанных (Сегодня)
+                      </Typography><br/><br/>
+                      <Grid container>
+                        <Grid sx={6} md={6}>
+                          <Typography
+                              color="textPrimary"
+                              //variant="h4"
+                              fontSize={14}
+                          >
+                            1
+                          </Typography>
+                        </Grid>
+                        <Grid sx={6} md={6}>
+                          <Avatar style={{float: 'right'}}
+                                  sx={{
+                                    backgroundColor: 'warning.main',
+                                    height: 30,
+                                    width: 30
+                                  }}
+                          >
+                            <InsertChartIcon />
+                          </Avatar>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                    <Grid item>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item style={{marginTop: '-10%'}} xs={6}  md={6}>
+              <Card
+                  sx={{ height: '80%' }}
+              >
+                <CardContent>
+                  <Grid
+                      container
+                      spacing={3}
+                      sx={{ justifyContent: 'space-between' }}
+                  >
+                    <Grid item>
+                      <Typography
+                          color="textSecondary"
+                          gutterBottom
+                          variant="overline"
+                          fontSize={8}
+                      >
+                        Количество нераспознанных (Сегодня)
+                      </Typography><br/><br/>
+                      <Grid container>
+                        <Grid sx={6} md={6}>
+                          <Typography
+                              color="textPrimary"
+                              //variant="h4"
+                              fontSize={14}
+                          >
+                            1
+                          </Typography>
+                        </Grid>
+                        <Grid sx={6} md={6}>
+                          <Avatar style={{float: 'right'}}
+                                  sx={{
+                                    backgroundColor: 'primary.main',
+                                    height: 30,
+                                    width: 30
+                                  }}
+                          >
+                            <InsertChartIcon />
+                          </Avatar>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                    <Grid item>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
+
+          </Grid>
+        </Grid>
+      </Grid>
       <div>
         <div className='grid-head'>
           <h3>Последние вошедшие:</h3>

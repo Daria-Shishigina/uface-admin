@@ -1,5 +1,5 @@
 // getTerminals
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   DataGridPro,
   GridColDef,
@@ -7,6 +7,7 @@ import {
   GridToolbar,
   ruRU,
 } from '@mui/x-data-grid-pro';
+import { CircularProgress } from '@mui/material';
 
 import { Table } from 'react-bootstrap';
 import { Tr } from 'components/clients/clients.styles';
@@ -88,6 +89,7 @@ export default function TerminalsGrid() {
     <div>
       <h1>Список терминалов</h1>
       <div style={{ height: '80vh' }}>
+          {columns.length === 0 ? <CircularProgress style={{ marginLeft: '50%', marginTop: '10%'}}/> :
         <DataGridPro
           rows={data}
           columns={columns}
@@ -117,7 +119,7 @@ export default function TerminalsGrid() {
               // },
             },
           }}
-        />
+        /> }
       </div>
     </div>
   );

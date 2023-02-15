@@ -9,12 +9,13 @@ import {
 } from '@mui/x-data-grid-pro';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
+import { CircularProgress } from '@mui/material';
 
 const style = {
   position: 'absolute' as 'absolute',
   top: '15%',
-  left: '20%',
-  width: '60%',
+  left: '12%',
+  width: '76%',
   height: '70%',
 };
 
@@ -108,10 +109,22 @@ const LogMainGrid = () => {
         'Content-Type': 'application/json',
       },
     });
+    const userData = { login, password, height: 200, pid };
+    const resPhoto = await fetch('/api/getPhotoFolk', {
+      method: 'POST',
+      body: JSON.stringify({ userData }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const photo: any = await resPhoto.json();
+    // console.log(photo?.photos[0]?.base64)
+    // console.log(params?.value)
     const dataFolks = await folks.json();
     setImgsrc({
-      value: params.value,
+      value: params?.value,
       fio: dataFolks?.folks?.[0]?.fio,
+      base_photo: (photo.status === 'success') ? photo?.photos[0]?.base64 || '' : '',
       phone: dataFolks?.folks?.[0]?.phone,
       dt_log: params?.row?.dt_log,
       dateborn: dataFolks?.folks?.[0]?.dateborn
@@ -217,11 +230,23 @@ const LogMainGrid = () => {
         <Box sx={{...style}} style={{backgroundColor: 'white'}}>
           <h2 id="parent-modal-title" style={{marginLeft: '20px'}}>Пользователь</h2>
           <hr/>
-          <Grid container>
-            <Grid item xs={6} style={{marginLeft: '20px'}}>
+          <Grid container spacing={0}>
+            <Grid item xs={4} style={{marginLeft: '20px'}}>
               <img src = {imgsrc.value} style={{height: '80%', width: '80%'}}/>
             </Grid>
-            <Grid item xs={5} style={{marginLeft: '20px'}}>
+            <Grid item xs={4}>
+              {imgsrc.base_photo !== '' ? (
+                  <img src = {imgsrc.base_photo} style={{height: '80%', width: '80%'}}/>
+              ) : (
+                  <span>
+                    Нет в базе
+                  </span>
+              )}
+            </Grid>
+            <Grid item xs={3} style={{marginLeft: '20px'}}>
+              <Typography sx={{ wordBreak: "break-word" }}>
+                Распознование: {(imgsrc.fio === undefined) ? 'Не распознан' : 'Распознан'}
+              </Typography><br/>
               <Typography sx={{ wordBreak: "break-word" }}>
                 ФИО: {imgsrc?.fio || null}
               </Typography><br/>
@@ -243,55 +268,57 @@ const LogMainGrid = () => {
           height: '50vh',
         }}
       >
-        <DataGridPro
-          rows={userList}
-          columns={columns}
-          pageSize={pageSize}
-          sx={{
-            '& .green': {
-              color: '#1bcf12',
-            },
-            '& .red': {
-              color: '#c72828',
-            },
-          }}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
-          // getRowId={(row) => row.id}
+        {userList.length === 0 ? <CircularProgress style={{ marginLeft: '50%', marginTop: '10%'}}/> :
+            <DataGridPro
+                rows={userList}
+                columns={columns}
+                pageSize={pageSize}
+                sx={{
+                  '& .green': {
+                    color: '#1bcf12',
+                  },
+                  '& .red': {
+                    color: '#c72828',
+                  },
+                }}
+                onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
+                // getRowId={(row) => row.id}
 
-          // node_modules/@mui/x-data-grid/DataGrid/useDataGridProps.d.ts; Строчка 3, значение 100 изменить на 500
-          // node_modules/@mui/x-data-grid/DataGrid/useDataGridProps.js; Строчка 19, значение 100 изменить на 500
-          rowsPerPageOptions={[5, 10, 25]}
-          checkboxSelection
-          disableSelectionOnClick
-          components={{ Toolbar: CustomToolbar }}
-          getCellClassName={(params: GridCellParams<number>) => {
-            return params.field === 'temperature' &&
-              params.row.temperature < params.row.std_temperature
-              ? 'green'
-              : params.field === 'temperature' &&
-                params.row.temperature > params.row.std_temperature
-              ? 'red'
-              : '';
-          }}
-          componentsProps={{
-            pagination: {
-              labelRowsPerPage: 'Количество на странице',
-              labelDisplayedRows: ({ from, to, count, page }: any) =>
-                `Страница ${page + 1} из ${Math.ceil(count / pageSize)}`,
-              // count: 1,
-              // page: 0,
-              // component: 'div', // here
-              // onPageChange: () => {},
-              // onRowsPerPageChange: () => {},
-              // nextIconButtonProps: {
-              //   disabled: true,
-              // },
-            },
-          }}
+                // node_modules/@mui/x-data-grid/DataGrid/useDataGridProps.d.ts; Строчка 3, значение 100 изменить на 500
+                // node_modules/@mui/x-data-grid/DataGrid/useDataGridProps.js; Строчка 19, значение 100 изменить на 500
+                rowsPerPageOptions={[5, 10, 25]}
+                checkboxSelection
+                disableSelectionOnClick
+                components={{ Toolbar: CustomToolbar }}
+                getCellClassName={(params: GridCellParams<number>) => {
+                  return params.field === 'temperature' &&
+                  params.row.temperature < params.row.std_temperature
+                      ? 'green'
+                      : params.field === 'temperature' &&
+                      params.row.temperature > params.row.std_temperature
+                          ? 'red'
+                          : '';
+                }}
+                componentsProps={{
+                  pagination: {
+                    labelRowsPerPage: 'Количество на странице',
+                    labelDisplayedRows: ({ from, to, count, page }: any) =>
+                        `Страница ${page + 1} из ${Math.ceil(count / pageSize)}`,
+                    // count: 1,
+                    // page: 0,
+                    // component: 'div', // here
+                    // onPageChange: () => {},
+                    // onRowsPerPageChange: () => {},
+                    // nextIconButtonProps: {
+                    //   disabled: true,
+                    // },
+                  },
+                }}
 
-          // components={{ Toolbar: GridToolbar }}
-        />
+                // components={{ Toolbar: GridToolbar }}
+            />
+        }
       </Box>
     </div>
   );

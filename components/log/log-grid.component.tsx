@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     DataGridPro,
     GridColDef,
@@ -13,6 +13,7 @@ import {
     GridCellParams,
 } from '@mui/x-data-grid-pro';
 import moment from 'moment';
+import { CircularProgress } from '@mui/material';
 
 import {IStudent} from './log-list.interfaces';
 
@@ -108,6 +109,7 @@ const LogGrid = () => {
         <div>
             <h1>Последние проходы</h1>
             <div style={{height: '80vh'}}>
+                {userList.length === 0 ? <CircularProgress style={{ marginLeft: '50%', marginTop: '10%'}}/> :
                 <DataGridPro
                     rows={userList}
                     columns={columns}
@@ -157,7 +159,7 @@ const LogGrid = () => {
                             // },
                         },
                     }}
-                />
+                /> }
             </div>
         </div>
     );

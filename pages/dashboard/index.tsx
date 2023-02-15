@@ -279,7 +279,7 @@ function LogStudentsMonitoring({}) {
           justifyContent: 'center',
         }}
       >
-        <CircularProgress />
+        {/*<CircularProgress />*/}
       </div>
     );
   //@ts-ignore

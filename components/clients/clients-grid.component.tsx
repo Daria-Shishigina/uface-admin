@@ -14,6 +14,9 @@ import {
   GridToolbarDensitySelector,
   GridToolbarFilterButton,
 } from '@mui/x-data-grid-pro';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 
 import {DataGrid} from '@mui/x-data-grid';
 
@@ -32,6 +35,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputLabel from '@mui/material/InputLabel';
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
+import PersonIcon from '@mui/icons-material/Person';
 
 import LoadingSpin from 'react-loading-spin';
 
@@ -81,6 +85,14 @@ const style = {
   left: '35%',
   width: '30%',
   height: '50%',
+};
+
+const styleSettings = {
+  position: 'absolute' as 'absolute',
+  top: '5%',
+  left: '35%',
+  width: '25%',
+  height: '55%',
 };
 
 const PanelStyles = styled.div`
@@ -297,11 +309,15 @@ const VisitorsGrid = () => {
   const [maxUsers, setMaxUsers] = useState(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [open, setOpen] = useState(false);
+  const [perOpen, setPerOpen] = useState(false);
   const handleOpen = () => {
     if (selectedBox.length === 0) return alert('Выберите пользователей')
     setOpen(true);
   }
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setPerOpen(false)
+  }
   let [clients, setClients] = useState<IClient[]>([]);
 
   const { user, setEditUser } = useGlobalContext();
@@ -445,7 +461,7 @@ const VisitorsGrid = () => {
       {
         field: 'action',
         headerName: 'Действия',
-        width: 160, //test
+        width: 200, //test
         sortable: false,
         renderCell: (params: any) => {
           const editFolk = (e: any) => {
@@ -474,6 +490,16 @@ const VisitorsGrid = () => {
             setClients(data.folks);
           };
 
+          const perSettings = async (e: any) => {
+            e.stopPropagation();
+
+            let login = sessionStorage.getItem('login');
+            let password = sessionStorage.getItem('password');
+            let reqParam = {login, password, pid: params.row.personid};
+
+            setPerOpen(true)
+          };
+
           const replication = async (e: any) => {
             let reqPar = {
               login: sessionStorage.getItem('login'),
@@ -500,6 +526,9 @@ const VisitorsGrid = () => {
                 </IconButton>
                 <IconButton aria-label='Тиражирование' onClick={replication}>
                   <ArrowOutwardIcon />
+                </IconButton>
+                <IconButton aria-label='Персональный настройки' onClick={perSettings}>
+                  <PersonIcon />
                 </IconButton>
               </>
           );
@@ -577,6 +606,7 @@ const VisitorsGrid = () => {
   };
 
   async function submitMassReplication() {
+    if (perOpen === true) return handleClose()
     if (terminalsSelectedBox.length === 0) return alert('Выберите терминал');
     let login = sessionStorage.getItem('login');
     let password = sessionStorage.getItem('password');
@@ -603,6 +633,41 @@ const VisitorsGrid = () => {
         <PanelAndFilter canAddUser={canAddUser} handleOpen={handleOpen} updateAfterRemoveCheckboxes={updateAfterRemoveCheckboxes} />
 
         <div style={{ height: '80vh' }}>
+
+
+          <Modal
+              open={perOpen}
+              onClose={handleClose}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+          >
+            <Box sx={{...styleSettings}} style={{backgroundColor: 'white'}}>
+              <h2 id="parent-modal-title" style={{marginLeft: '20px'}}>Персональные настройки</h2><hr/>
+              <div>
+                <FormGroup>
+                  <FormControlLabel control={<Checkbox defaultChecked />} label="cardAndPasswordPermission" />
+                  <FormControlLabel control={<Checkbox defaultChecked />} label="faceAndCardPermission" />
+                  <FormControlLabel control={<Checkbox defaultChecked />} label="faceAndPasswordPermission" />
+                  <FormControlLabel control={<Checkbox defaultChecked />} label="idCardPermission" />
+                  <FormControlLabel control={<Checkbox defaultChecked />} label="qrCodePermit" />
+                  <FormControlLabel control={<Checkbox defaultChecked />} label="role" />
+                  <FormControlLabel control={<Checkbox defaultChecked />} label="type" />
+                  <FormControlLabel control={<Checkbox defaultChecked />} label="scheduleId" />
+                </FormGroup>
+              </div><br/>
+
+              <div style={{backgroundColor: 'white'}}>
+                <Grid container justifyContent="flex-end">
+                  <Button variant="contained" onClick={() => setOpen(true)}>Установить на терминалах</Button><br/>
+                </Grid>
+              </div>
+            </Box>
+          </Modal>
+
+
+
+
+
           <Modal
               open={open}
               onClose={handleClose}

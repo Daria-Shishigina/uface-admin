@@ -64,6 +64,7 @@ const ModalEdit = ({func}: any) => {
   const webcamRef = useRef(null);
   const [imgSrc, setImgSrc] = useState(null);
   const [imgHidden, setImgHidden] = useState(1);
+  const [onlyPwd, setOnlyPwd] = useState(0);
 
   let inpFile: any = null;
 
@@ -114,7 +115,7 @@ const ModalEdit = ({func}: any) => {
       email: editUser?.email,
       fname: editUser?.fname,
       activated: editUser?.activated,
-      phone_approve: editUser?.phone_approve,
+      phone_approve: parseInt(editUser?.phone_approve),
       lname: editUser?.lname,
       sname: editUser?.sname,
       dateborn: moment(editUser?.dateborn, 'YYYY-MM-DD').format('DD.MM.YYYY'),
@@ -123,6 +124,7 @@ const ModalEdit = ({func}: any) => {
       vuz_kod: editUser?.vuz_kod,
     },
   };
+  console.log(formOptions)
 
   const { register, handleSubmit, getValues, reset, formState } =
     useForm(formOptions);
@@ -169,13 +171,12 @@ const ModalEdit = ({func}: any) => {
         : 'Редактирование пользователя'
     );
 
-    // console.log({ data });
-
     data.login = login;
     data.password = password;
     data.activated = `${data.activated}`;
     data.phone_approve = data.phone_approve ? '1' : '0';
     data.photo = photo;
+    data.onlyPwd = onlyPwd;
 
     const res = await fetch(api, {
       method: 'PUT',
@@ -184,7 +185,6 @@ const ModalEdit = ({func}: any) => {
         'Content-Type': 'application/json',
       },
     });
-
     let resData = await res.json();
 
     // console.log({ resData });
@@ -680,8 +680,46 @@ const ModalEdit = ({func}: any) => {
 
               {/* Форма */}
               <form onSubmit={handleSubmit(submitHandler, onError)}>
+              <div className='form-row'>
+                <div className='form-group col'>
+                  <label>Изменить пароль</label>
+                  <input
+                      type='hidden'
+                      value={onlyPwd}
+                      name='onlyPwd'
+                      {...register('onlyPwd')}
+                  />
+                  <input
+                      // @ts-ignore
+                      name='pwd'
+                      type='text'
+                      {...register('pwd')}
+                      className={`form-control ${
+                          errors.password ? 'is-invalid' : ''
+                      }`}
+                  />
+                  <div className='invalid-feedback'>
+                    {errors.password?.message}
+                  </div>
+                  <button type='submit' className='btn btn-primary btn-sm' style={{marginTop: "10px", float: 'right'}}
+                          onClick={() => {
+                            setOnlyPwd(1)
+                          }}>
+                    {'Подтвердить'}
+                  </button>
+                </div>
+              </div>
+              </form>
+              <hr/>
+              <form onSubmit={handleSubmit(submitHandler, onError)}>
                 <div className='form-row'>
                   <div className='form-group col'>
+                    <input
+                        type='hidden'
+                        value={onlyPwd}
+                        name='onlyPwd'
+                        {...register('onlyPwd')}
+                    />
                     <label>E-Mail</label>
                     <input
                       // @ts-ignore
@@ -701,29 +739,9 @@ const ModalEdit = ({func}: any) => {
                         // @ts-ignore
                         name='activated'
                         type='checkbox'
-                        {...register('activated')}
+                        checked={parseInt(formOptions.defaultValues.activated)}
                       />
                     </div>
-                  </div>
-                </div>
-                <div className='form-row'>
-                  <div className='form-group col'>
-                    <label>Изменить пароль</label>
-                    <input
-                        // @ts-ignore
-                        name='pwd'
-                        type='text'
-                        {...register('pwd')}
-                        className={`form-control ${
-                            errors.password ? 'is-invalid' : ''
-                        }`}
-                    />
-                    <div className='invalid-feedback'>
-                      {errors.password?.message}
-                    </div>
-                    <button type='submit' className='btn btn-primary btn-sm' style={{marginTop: "10px", float: 'right'}}>
-                      {'Подтвердить'}
-                    </button>
                   </div>
                 </div>
                 {/*style={{marginTop: '-30px'}}*/}
@@ -799,7 +817,7 @@ const ModalEdit = ({func}: any) => {
                         // @ts-ignore
                         name='phone_approve'
                         type='checkbox'
-                        {...register('phone_approve')}
+                        checked={parseInt(formOptions.defaultValues.phone_approve)}
                       />
                     </div>
                   </div>
@@ -998,7 +1016,11 @@ const ModalEdit = ({func}: any) => {
                     <div style={{ margin: '10px 0' }}>{server?.statusdesc}</div>
                   )}
 
-                  <button type='submit' className='btn btn-primary mr-1'>
+                  <button type='submit' className='btn btn-primary mr-1'
+                          onClick={() => {
+                            setOnlyPwd(0)
+                          }}
+                  >
                     {!!server && server?.status !== 'success'
                       ? 'Подождите...'
                       : 'Подтвердить'}

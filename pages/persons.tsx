@@ -12,6 +12,8 @@ import StatsComponents from 'components/Stats/stats.components';
 import LogList from 'components/log/log-list.component';
 import VisitorsTable from 'components/clients/clients.components';
 import VisitorsGrid from 'components/clients/clients-grid.component';
+import BlockUi from 'react-block-ui';
+import 'react-block-ui/style.css';
 
 //interfaces
 interface IProps {}
@@ -19,7 +21,7 @@ interface IProps {}
 const PersonsPage: NextPage = ({}: IProps) => {
   //Временная мера
   const { setUser } = useGlobalContext();
-
+  const [blocking, setBlocking] = useState(false);
   useEffect(() => {
     if (window) {
       //@ts-ignore
@@ -33,7 +35,9 @@ const PersonsPage: NextPage = ({}: IProps) => {
 
   return (
     <DashboardBody>
-      <VisitorsGrid />
+      <BlockUi tag="div" blocking={blocking} style={{cursor: 'default'}}>
+      <VisitorsGrid setBlocking={setBlocking}/>
+      </BlockUi>
       {/* <VisitorsTable /> */}
     </DashboardBody>
   );

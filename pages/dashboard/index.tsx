@@ -193,6 +193,7 @@ function LogStudentsMonitoring({}) {
   const [users, setUsers] = useState<IStudent[]>([]);
   const [listProp, setListProp] = useState<any[]>([]);
   const [photo, setPhoto] = useState<any>('');
+  const [photoNotFound, setPhotoNotFound] = useState<any>('none');
 
   async function getPhoto(pid: string) {
     let login = sessionStorage.getItem('login');
@@ -237,6 +238,9 @@ function LogStudentsMonitoring({}) {
       }).then((result) => result.json());
 
       // console.log({ res });
+        console.log('=====')
+      console.log(res.logs)
+      console.log('=====')
       setUsers(res.logs);
     },
     {
@@ -267,6 +271,12 @@ function LogStudentsMonitoring({}) {
       setListProp(newListProp);
     }
   }, [users]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (photo === '') setPhotoNotFound('block');
+    }, 3000);
+  }, []);
 
   if (status === 'loading')
     return (
@@ -325,7 +335,7 @@ function LogStudentsMonitoring({}) {
                         marginLeft: 10,
                       }}
                   >
-                    Нет в базе
+                    <div id="photoNotFound" style={{display: photoNotFound}}>Нет в базе</div>
                   </div>
               )}
             </LastEntered>

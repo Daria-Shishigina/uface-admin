@@ -10,6 +10,7 @@ import {
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import { CircularProgress } from '@mui/material';
+import Moment from 'react-moment';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -120,14 +121,20 @@ const LogMainGrid = () => {
     const photo: any = await resPhoto.json();
     // console.log(photo?.photos[0]?.base64)
     // console.log(params?.value)
+    console.log("=========")
     const dataFolks = await folks.json();
+    console.log(dataFolks)
+    console.log(params)
+    console.log("=========")
     setImgsrc({
       value: params?.value,
+      id: dataFolks?.folks?.[0]?.id,
       fio: dataFolks?.folks?.[0]?.fio,
       base_photo: (photo.status === 'success') ? photo?.photos[0]?.base64 || '' : '',
       phone: dataFolks?.folks?.[0]?.phone,
-      dt_log: params?.row?.dt_log,
-      dateborn: dataFolks?.folks?.[0]?.dateborn
+      email: dataFolks?.folks?.[0]?.email,
+      dt_log: moment(params?.row?.dt_log).format('DD.MM.YYYY HH:mm:ss'),
+      dateborn: moment(dataFolks?.folks?.[0]?.dateborn).format('DD.MM.YYYY')
     });
     setOpen(true);
   }
@@ -228,7 +235,7 @@ const LogMainGrid = () => {
           aria-describedby="modal-modal-description"
       >
         <Box sx={{...style}} style={{backgroundColor: 'white'}}>
-          <h2 id="parent-modal-title" style={{marginLeft: '20px'}}>Пользователь</h2>
+          <h2 id="parent-modal-title" style={{marginLeft: '20px'}}>ID:{imgsrc.id}</h2>
           <hr/>
           <Grid container spacing={0}>
             <Grid item xs={4} style={{marginLeft: '20px'}}>
@@ -245,19 +252,22 @@ const LogMainGrid = () => {
             </Grid>
             <Grid item xs={3} style={{marginLeft: '20px'}}>
               <Typography sx={{ wordBreak: "break-word" }}>
-                Распознование: {(imgsrc.fio === undefined) ? 'Не распознан' : 'Распознан'}
+                <strong>Распознование: </strong><br/>{(imgsrc.fio === undefined) ? 'Не распознан' : 'Распознан'}
               </Typography><br/>
               <Typography sx={{ wordBreak: "break-word" }}>
-                ФИО: {imgsrc?.fio || null}
+                <strong> ФИО: </strong><br/>{imgsrc?.fio || null}
               </Typography><br/>
               <Typography sx={{ wordBreak: "break-word" }}>
-                Дата распознования: {imgsrc?.dt_log || null}
+                <strong>Дата распознования: </strong><br/>{imgsrc?.dt_log || null}
               </Typography><br/>
               <Typography sx={{ wordBreak: "break-word" }}>
-                Телефон: {imgsrc?.phone || null}
+                <strong> Телефон: </strong> <br/>{imgsrc?.phone || null}
               </Typography><br/>
               <Typography sx={{ wordBreak: "break-word" }}>
-                Дата рождения: {imgsrc?.dateborn || null}
+                <strong>Email:</strong><br/> {imgsrc?.email || null}
+              </Typography><br/>
+              <Typography sx={{ wordBreak: "break-word" }}>
+                <strong>Дата рождения: </strong><br/>{imgsrc?.dateborn || null}
               </Typography>
             </Grid>
           </Grid>

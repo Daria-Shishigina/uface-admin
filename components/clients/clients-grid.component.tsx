@@ -17,7 +17,6 @@ import {
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-
 import {DataGrid} from '@mui/x-data-grid';
 
 import {
@@ -26,8 +25,9 @@ import {
   MenuItem,
   Pagination,
   Select,
-  TextField,
   Button,
+  TextField,
+  Field,
   SelectChangeEvent
 } from '@mui/material';
 import FormHelperText from '@mui/material/FormHelperText';
@@ -51,6 +51,7 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import {useQuery} from "react-query";
 import CopyAccsToTerminals from "../../pages/api/CopyAccsToTerminals";
+import {UserPicture} from "../Header/header.styles";
 
 export interface IClient {
   dateborn: string;
@@ -90,9 +91,9 @@ const style = {
 const styleSettings = {
   position: 'absolute' as 'absolute',
   top: '5%',
-  left: '35%',
-  width: '25%',
-  height: '55%',
+  left: '15%',
+  width: '70%',
+  height: '75%',
 };
 
 const PanelStyles = styled.div`
@@ -117,7 +118,7 @@ const PanelStyles = styled.div`
 let selectedBox = [];
 let terminalsSelectedBox = [];
 
-const PanelAndFilter = ({ canAddUser, handleOpen, updateAfterRemoveCheckboxes }: { canAddUser: boolean, updateAfterRemoveCheckboxes: any }) => {
+const PanelAndFilter = ({ canAddUser, setPerOpen, handleOpen, updateAfterRemoveCheckboxes }: { canAddUser: boolean, updateAfterRemoveCheckboxes: any }) => {
   const { setEditUser } = useGlobalContext();
 
   return (
@@ -153,6 +154,15 @@ const PanelAndFilter = ({ canAddUser, handleOpen, updateAfterRemoveCheckboxes }:
                 }}
             >
               Создать пользователя
+            </button>
+        )}
+
+        {canAddUser && (
+            <button
+                type='button'
+                onClick={() => setPerOpen(true)}
+            >
+              Персональные настройки
             </button>
         )}
 
@@ -298,7 +308,7 @@ function CustomToolbar() {
   );
 }
 
-const VisitorsGrid = () => {
+const VisitorsGrid = ({setBlocking}) => {
   const [columns, setColumns] = useState<any[]>([]);
 
   //Примитивный роутинг
@@ -310,6 +320,7 @@ const VisitorsGrid = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [open, setOpen] = useState(false);
   const [perOpen, setPerOpen] = useState(false);
+  const [curUser, setCurUser] = useState('');
   const handleOpen = () => {
     if (selectedBox.length === 0) return alert('Выберите пользователей')
     setOpen(true);
@@ -496,7 +507,7 @@ const VisitorsGrid = () => {
             let login = sessionStorage.getItem('login');
             let password = sessionStorage.getItem('password');
             let reqParam = {login, password, pid: params.row.personid};
-
+            setCurUser(params.row.personid);
             setPerOpen(true)
           };
 
@@ -605,17 +616,20 @@ const VisitorsGrid = () => {
     setReplicationType(event.target.value);
   };
 
-  async function submitMassReplication() {
-    if (perOpen === true) return handleClose()
+  async function submitMassReplication(setBlocking) {
+    // if (perOpen === true) return handleClose()
+    let isSettings = (perOpen === true);
     if (terminalsSelectedBox.length === 0) return alert('Выберите терминал');
     let login = sessionStorage.getItem('login');
     let password = sessionStorage.getItem('password');
+    handleClose();
+    setBlocking(true)
     for (let i = 0; i < selectedBox.length; i++) {
       for (let s = 0; s < terminalsSelectedBox.length; s++) {
         let terminalUri = `http://${terminalsSelectedBox[s].ip}:${terminalsSelectedBox[s].port}`;
-        let uri = `/api/${replicationType}`;
-        let reqParam = {login, password, personid: selectedBox[i].personid, terminal: terminalUri};
-        fetch(uri, {
+        let uri = (isSettings === true) ? '/api/personSettings' : `/api/${replicationType}`;
+        let reqParam = {login, password, data: formValues, personid: selectedBox[i].personid, terminal: terminalUri};
+        await fetch(uri, {
           method: 'POST',
           body: JSON.stringify({data: reqParam}),
           headers: {
@@ -624,13 +638,47 @@ const VisitorsGrid = () => {
         });
       }
     }
-    handleClose();
+    if ((curUser !== '') && (isSettings === true)) {
+      for (let s = 0; s < terminalsSelectedBox.length; s++) {
+        let terminalUri = `http://${terminalsSelectedBox[s].ip}:${terminalsSelectedBox[s].port}`;
+        let uri = '/api/personSettings';
+        let reqParam = {login, password, data: formValues, personid: curUser, terminal: terminalUri};
+        await fetch(uri, {
+          method: 'POST',
+          body: JSON.stringify({data: reqParam}),
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+      }
+    }
+    setCurUser('');
+    setBlocking(false)
   }
+
+  const [formValues, setFormValues] = useState({
+    cardAndPasswordPermission: 1,
+    faceAndCardPermission: 1,
+    faceAndPasswordPermission: 1,
+    facePermission: 2,
+    iDNumber: '',
+    role: 0,
+    type: 1,
+    idCardPermission: 1,
+    idcardNum: '',
+    password: '',
+    passwordPermission: 1,
+    tag: ''
+  });
+
+  const handleChangeForm = name => event => {
+    setFormValues({ ...formValues, [name]: event.target.value });
+  };
 
   return (
       <>
 
-        <PanelAndFilter canAddUser={canAddUser} handleOpen={handleOpen} updateAfterRemoveCheckboxes={updateAfterRemoveCheckboxes} />
+        <PanelAndFilter canAddUser={canAddUser} setPerOpen={setPerOpen} handleOpen={handleOpen} updateAfterRemoveCheckboxes={updateAfterRemoveCheckboxes} />
 
         <div style={{ height: '80vh' }}>
 
@@ -642,25 +690,118 @@ const VisitorsGrid = () => {
               aria-describedby="modal-modal-description"
           >
             <Box sx={{...styleSettings}} style={{backgroundColor: 'white'}}>
-              <h2 id="parent-modal-title" style={{marginLeft: '20px'}}>Персональные настройки</h2><hr/>
+              <h2 id="parent-modal-title" style={{marginLeft: '10px', marginTop: '10px'}}>Персональные настройки</h2><hr/>
               <div>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox defaultChecked />} label="cardAndPasswordPermission" />
-                  <FormControlLabel control={<Checkbox defaultChecked />} label="faceAndCardPermission" />
-                  <FormControlLabel control={<Checkbox defaultChecked />} label="faceAndPasswordPermission" />
-                  <FormControlLabel control={<Checkbox defaultChecked />} label="idCardPermission" />
-                  <FormControlLabel control={<Checkbox defaultChecked />} label="qrCodePermit" />
-                  <FormControlLabel control={<Checkbox defaultChecked />} label="role" />
-                  <FormControlLabel control={<Checkbox defaultChecked />} label="type" />
-                  <FormControlLabel control={<Checkbox defaultChecked />} label="scheduleId" />
+                <FormGroup formValues={formValues} handleChangeForm={handleChangeForm}>
+                  <Grid container spacing={1}>
+                    <Grid item xs={6} md={6}>
+                      <TextField
+                          fullWidth
+                          size="small"
+                          type="number"
+                          defaultValue={1}
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          onChange={handleChangeForm("cardAndPasswordPermission")}
+                          label='Card and password permission'
+                      /><br/><br/>
+                      <TextField
+                          fullWidth
+                          size="small"
+                          type="number"
+                          defaultValue={1}
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          onChange={handleChangeForm("faceAndCardPermission")}
+                          label='Face and card permission'
+                      /><br/><br/>
+                      <TextField
+                          fullWidth
+                          size="small"
+                          type="number"
+                          defaultValue={1}
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          onChange={handleChangeForm("faceAndPasswordPermission")}
+                          label='Face and password permission'
+                      /><br/><br/>
+                      <TextField
+                          fullWidth
+                          size="small"
+                          type="number"
+                          defaultValue={2}
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          onChange={handleChangeForm("facePermission")}
+                          label='Face permission'
+                      /><br/><br/>
+                      <TextField
+                          fullWidth
+                          size="small"
+                          label='Id number'
+                          onChange={handleChangeForm("iDNumber")}
+                      /><br/><br/>
+                      <FormControlLabel control={<Checkbox />} onChange={handleChangeForm("role")} label="Role" /><br/>
+                      <FormControlLabel control={<Checkbox defaultChecked />} onChange={handleChangeForm("type")} label="Type" />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                          fullWidth
+                          size="small"
+                          type="number"
+                          defaultValue={1}
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          onChange={handleChangeForm("idCardPermission")}
+                          label='Id card permission'
+                      /><br/><br/>
+                      <TextField
+                          fullWidth
+                          size="small"
+                          onChange={handleChangeForm("idcardNum")}
+                          label='Id card number'
+                      /><br/><br/>
+                      <TextField
+                          fullWidth
+                          size="small"
+                          label='Password'
+                          onChange={handleChangeForm("password")}
+                      /><br/><br/>
+                      <TextField
+                          fullWidth
+                          size="small"
+                          type="number"
+                          defaultValue={1}
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          onChange={handleChangeForm("passwordPermission")}
+                          label='Password permission'
+                      /><br/><br/>
+                      <TextField
+                          fullWidth
+                          size="small"
+                          label='Tag'
+                          onChange={handleChangeForm("tag")}
+                      /><br/><br/>
+                    </Grid>
+                  </Grid>
+                  <div style={{backgroundColor: 'white'}}>
+                    <Grid container justifyContent="flex-end" style={{
+                      position: "absolute",
+                      margin: "auto",
+                      bottom: 30}}>
+                      <Button variant="contained" onClick={() => setOpen(true)}>Установить на терминалах</Button><br/>
+                    </Grid>
+                    <br/>
+                  </div>
                 </FormGroup>
               </div><br/>
-
-              <div style={{backgroundColor: 'white'}}>
-                <Grid container justifyContent="flex-end">
-                  <Button variant="contained" onClick={() => setOpen(true)}>Установить на терминалах</Button><br/>
-                </Grid>
-              </div>
             </Box>
           </Modal>
 
@@ -676,24 +817,26 @@ const VisitorsGrid = () => {
           >
             <Box sx={{...style}} style={{backgroundColor: 'white'}}>
               <h2 id="parent-modal-title" style={{marginLeft: '20px'}}>Список терминалов</h2><hr/>
-              <div>
-                <Select
-                    labelId="demo-simple-select-helper-label"
-                    id="demo-simple-select-helper"
-                    value={replicationType}
-                    onChange={changeReplicationType}
-                    style={{width: '100%'}}
-                >
-                  <MenuItem value={'CopyAccsToTerminals'}>Тиражирование без фото</MenuItem>
-                  <MenuItem value={'EditAccsToTerminals'}>Тиражирование без фото (изменение данных)</MenuItem>
-                  <MenuItem value={'CopyAccsFacesToTerminals'}>Тиражирование с фото</MenuItem>
-                  <MenuItem value={'EditAccsFacesToTerminals'}>Тиражирование с фото (изменение данных)</MenuItem>
-                </Select>
-                <FormHelperText>Тип тиражирования</FormHelperText>
-              </div><br/>
-
-
-
+              {perOpen === false ? (
+                  <div>
+                    <Select
+                        labelId="demo-simple-select-helper-label"
+                        id="demo-simple-select-helper"
+                        value={replicationType}
+                        onChange={changeReplicationType}
+                        style={{width: '100%'}}
+                    >
+                      <MenuItem value={'CopyAccsToTerminals'}>Тиражирование без фото</MenuItem>
+                      <MenuItem value={'EditAccsToTerminals'}>Тиражирование без фото (изменение данных)</MenuItem>
+                      <MenuItem value={'CopyAccsFacesToTerminals'}>Тиражирование с фото</MenuItem>
+                      <MenuItem value={'EditAccsFacesToTerminals'}>Тиражирование с фото (изменение данных)</MenuItem>
+                    </Select>
+                    <FormHelperText>Тип тиражирования</FormHelperText>
+                  </div>
+              ) : (
+                  <span></span>
+              )}
+              <br/>
               <DataGrid
                   style={{backgroundColor: 'white'}}
                   rows={terminalsData}
@@ -705,7 +848,7 @@ const VisitorsGrid = () => {
                 />
                 <div style={{backgroundColor: 'white'}}>
                   <Grid container justifyContent="flex-end">
-                    <Button variant="contained" onClick={(_) => submitMassReplication()}>Подтвердить</Button>
+                    <Button variant="contained" onClick={(_) => submitMassReplication(setBlocking)}>Подтвердить</Button>
                   </Grid>
                 </div>
             </Box>

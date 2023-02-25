@@ -739,7 +739,7 @@ const ModalEdit = ({func}: any) => {
                         // @ts-ignore
                         name='activated'
                         type='checkbox'
-                        checked={parseInt(formOptions.defaultValues.activated)}
+                        defaultChecked={parseInt(formOptions.defaultValues.activated)}
                       />
                     </div>
                   </div>
@@ -817,7 +817,7 @@ const ModalEdit = ({func}: any) => {
                         // @ts-ignore
                         name='phone_approve'
                         type='checkbox'
-                        checked={parseInt(formOptions.defaultValues.phone_approve)}
+                        defaultChecked={parseInt(formOptions.defaultValues.phone_approve)}
                       />
                     </div>
                   </div>

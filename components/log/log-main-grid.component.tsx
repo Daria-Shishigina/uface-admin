@@ -121,11 +121,8 @@ const LogMainGrid = () => {
     const photo: any = await resPhoto.json();
     // console.log(photo?.photos[0]?.base64)
     // console.log(params?.value)
-    console.log("=========")
     const dataFolks = await folks.json();
     console.log(dataFolks)
-    console.log(params)
-    console.log("=========")
     setImgsrc({
       value: params?.value,
       id: dataFolks?.folks?.[0]?.id,
@@ -235,7 +232,7 @@ const LogMainGrid = () => {
           aria-describedby="modal-modal-description"
       >
         <Box sx={{...style}} style={{backgroundColor: 'white'}}>
-          <h2 id="parent-modal-title" style={{marginLeft: '20px'}}>ID:{imgsrc.id}</h2>
+          <h2 id="parent-modal-title" style={{marginLeft: '20px'}}>ID: {imgsrc.id}</h2>
           <hr/>
           <Grid container spacing={0}>
             <Grid item xs={4} style={{marginLeft: '20px'}}>

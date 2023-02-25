@@ -31,13 +31,14 @@ export default async function handler(
             Upassword,
             passwordPermission,
             tag,
+        } = req.body.data.data;
+
+        const {
             personid,
             terminal,
             password,
             login
         } = req.body.data;
-
-        console.log(req.body.data);
 
         const settings = {
             cardAndPasswordPermission,
@@ -71,6 +72,7 @@ export default async function handler(
             rejectUnauthorized: false,
         });
 
+        console.log(urlencoded)
         let requestOptions: IReqOption = {
             method: 'POST',
             headers: loginHeaders,

@@ -623,12 +623,22 @@ const VisitorsGrid = ({setBlocking}) => {
     let login = sessionStorage.getItem('login');
     let password = sessionStorage.getItem('password');
     handleClose();
+
+    let dataForSend = JSON.parse(JSON.stringify(formValues))
+    dataForSend.cardAndPasswordPermission += 1;
+    dataForSend.faceAndCardPermission += 1;
+    dataForSend.faceAndPasswordPermission += 1;
+    dataForSend.facePermission += 1;
+    dataForSend.idCardPermission += 1;
+    dataForSend.passwordPermission += 1;
+
+
     setBlocking(true)
     for (let i = 0; i < selectedBox.length; i++) {
       for (let s = 0; s < terminalsSelectedBox.length; s++) {
         let terminalUri = `http://${terminalsSelectedBox[s].ip}:${terminalsSelectedBox[s].port}`;
         let uri = (isSettings === true) ? '/api/personSettings' : `/api/${replicationType}`;
-        let reqParam = {login, password, data: formValues, personid: selectedBox[i].personid, terminal: terminalUri};
+        let reqParam = {login, password, data: dataForSend, personid: selectedBox[i].personid, terminal: terminalUri};
         await fetch(uri, {
           method: 'POST',
           body: JSON.stringify({data: reqParam}),
@@ -642,7 +652,7 @@ const VisitorsGrid = ({setBlocking}) => {
       for (let s = 0; s < terminalsSelectedBox.length; s++) {
         let terminalUri = `http://${terminalsSelectedBox[s].ip}:${terminalsSelectedBox[s].port}`;
         let uri = '/api/personSettings';
-        let reqParam = {login, password, data: formValues, personid: curUser, terminal: terminalUri};
+        let reqParam = {login, password, data: dataForSend, personid: curUser, terminal: terminalUri};
         await fetch(uri, {
           method: 'POST',
           body: JSON.stringify({data: reqParam}),
@@ -657,22 +667,22 @@ const VisitorsGrid = ({setBlocking}) => {
   }
 
   const [formValues, setFormValues] = useState({
-    cardAndPasswordPermission: 1,
-    faceAndCardPermission: 1,
-    faceAndPasswordPermission: 1,
-    facePermission: 2,
+    cardAndPasswordPermission: 0,
+    faceAndCardPermission: 0,
+    faceAndPasswordPermission: 0,
+    facePermission: 1,
     iDNumber: '',
     role: 0,
     type: 1,
-    idCardPermission: 1,
+    idCardPermission: 0,
     idcardNum: '',
-    password: '',
-    passwordPermission: 1,
+    Upassword: '',
+    passwordPermission: 0,
     tag: ''
   });
 
   const handleChangeForm = name => event => {
-    setFormValues({ ...formValues, [name]: event.target.value });
+    setFormValues({ ...formValues, [name]: event.target.checked });
   };
 
   return (
@@ -695,100 +705,62 @@ const VisitorsGrid = ({setBlocking}) => {
                 <FormGroup formValues={formValues} handleChangeForm={handleChangeForm}>
                   <Grid container spacing={1}>
                     <Grid item xs={6} md={6}>
-                      <TextField
-                          fullWidth
-                          size="small"
-                          type="number"
-                          defaultValue={1}
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                          onChange={handleChangeForm("cardAndPasswordPermission")}
-                          label='Card and password permission'
-                      /><br/><br/>
-                      <TextField
-                          fullWidth
-                          size="small"
-                          type="number"
-                          defaultValue={1}
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                          onChange={handleChangeForm("faceAndCardPermission")}
-                          label='Face and card permission'
-                      /><br/><br/>
-                      <TextField
-                          fullWidth
-                          size="small"
-                          type="number"
-                          defaultValue={1}
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                          onChange={handleChangeForm("faceAndPasswordPermission")}
-                          label='Face and password permission'
-                      /><br/><br/>
-                      <TextField
-                          fullWidth
-                          size="small"
-                          type="number"
-                          defaultValue={2}
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                          onChange={handleChangeForm("facePermission")}
-                          label='Face permission'
-                      /><br/><br/>
+                      <FormControlLabel control={<Checkbox/>} onChange={handleChangeForm("cardAndPasswordPermission")} label="Card and password permission" />
+                      <br/>
+                      <FormControlLabel control={<Checkbox />} onChange={handleChangeForm("faceAndCardPermission")} label="Face and card permission" />
+                      <br/>
+                      <FormControlLabel control={<Checkbox />} onChange={handleChangeForm("faceAndPasswordPermission")} label="Face and password permission" />
+                      <br/>
+                      <FormControlLabel control={<Checkbox defaultChecked/>} onChange={handleChangeForm("facePermission")} label="Face permission" />
+                      <br/>
                       <TextField
                           fullWidth
                           size="small"
                           label='Id number'
                           onChange={handleChangeForm("iDNumber")}
                       /><br/><br/>
-                      <FormControlLabel control={<Checkbox />} onChange={handleChangeForm("role")} label="Role" /><br/>
-                      <FormControlLabel control={<Checkbox defaultChecked />} onChange={handleChangeForm("type")} label="Type" />
+                      <TextField
+                          fullWidth
+                          size="small"
+                          type="number"
+                          defaultValue={0}
+                          label='Role'
+                          onChange={handleChangeForm("role")}
+                      /><br/><br/>
+                      <TextField
+                          fullWidth
+                          size="small"
+                          type="number"
+                          defaultValue={1}
+                          label='Type'
+                          onChange={handleChangeForm("type")}
+                      /><br/><br/>
+                      {/*<FormControlLabel control={<Checkbox />} onChange={handleChangeForm("role")} label="Role" /><br/>*/}
+                      {/*<FormControlLabel control={<Checkbox defaultChecked />} onChange={handleChangeForm("type")} label="Type" />*/}
                     </Grid>
                     <Grid item xs={6}>
                       <TextField
                           fullWidth
                           size="small"
-                          type="number"
-                          defaultValue={1}
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                          onChange={handleChangeForm("idCardPermission")}
-                          label='Id card permission'
-                      /><br/><br/>
-                      <TextField
-                          fullWidth
-                          size="small"
                           onChange={handleChangeForm("idcardNum")}
                           label='Id card number'
-                      /><br/><br/>
+                      /><br/>
+                      <FormControlLabel control={<Checkbox/>} onChange={handleChangeForm("idCardPermission")} label="Id card permission" />
+                      <br/>
                       <TextField
                           fullWidth
                           size="small"
                           label='Password'
-                          onChange={handleChangeForm("password")}
-                      /><br/><br/>
-                      <TextField
-                          fullWidth
-                          size="small"
-                          type="number"
-                          defaultValue={1}
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                          onChange={handleChangeForm("passwordPermission")}
-                          label='Password permission'
-                      /><br/><br/>
+                          onChange={handleChangeForm("Upassword")}
+                      /><br/>
+                      <FormControlLabel control={<Checkbox/>} onChange={handleChangeForm("passwordPermission")} label="Password permission" />
+                      <br/>
                       <TextField
                           fullWidth
                           size="small"
                           label='Tag'
                           onChange={handleChangeForm("tag")}
-                      /><br/><br/>
+                      /><br/>
                     </Grid>
                   </Grid>
                   <div style={{backgroundColor: 'white'}}>

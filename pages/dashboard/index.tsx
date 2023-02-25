@@ -12,6 +12,7 @@ import { DashboardBody } from 'styles/dashboard.styles';
 //components
 import { IStudent } from 'components/log/log-list.interfaces';
 import { useQuery } from 'react-query';
+import moment from 'moment';
 import styled from 'styled-components';
 import Moment from 'react-moment';
 import Link from 'next/link';
@@ -22,6 +23,11 @@ import Box from '@mui/material/Box';
 import InsertChartIcon from '@mui/icons-material/InsertChartOutlined';
 import PeopleIcon from '@mui/icons-material/PeopleOutlined';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import TextField from '@mui/material/TextField';
+import dayjs, { Dayjs } from 'dayjs';
 
 import { Avatar, Card, CardContent, Typography } from '@mui/material';
 import MoneyIcon from '@mui/icons-material/Money';
@@ -194,6 +200,19 @@ function LogStudentsMonitoring({}) {
   const [listProp, setListProp] = useState<any[]>([]);
   const [photo, setPhoto] = useState<any>('');
   const [photoNotFound, setPhotoNotFound] = useState<any>('none');
+  const [totalUserPeriod, setTotalUserPeriod] = useState<any>(0);
+  const [totalUserPeriodEntry, setTotalUserPeriodEntry] = useState<any>(0);
+  const [totalUserPeriodExit, setTotalUserPeriodExit] = useState<any>(0);
+  const [totalPersons, setTotalPersons] = useState<any>(0);
+
+
+
+  const [value, setValue] = useState<Dayjs | null>(
+      dayjs('2023-25-02T21:11:54'),
+  );
+  const handleChange = (newValue: Dayjs | null) => {
+    setValue(newValue);
+  };
 
   async function getPhoto(pid: string) {
     let login = sessionStorage.getItem('login');
@@ -237,10 +256,38 @@ function LogStudentsMonitoring({}) {
         },
       }).then((result) => result.json());
 
-      // console.log({ res });
-        console.log('=====')
-      console.log(res.logs)
-      console.log('=====')
+      let total = await fetch('/api/getLogRecognition', {
+        method: 'POST',
+        body: JSON.stringify({
+          login,
+          password,
+          from_d: moment().subtract(1, 'days').format('DD.MM.YYYY HH:mm:ss'),
+          to_d: moment().format('DD.MM.YYYY HH:mm:ss'),
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).then((result) => result.json());
+
+      const user = { login, password, limit: 10000, offset: 0 };
+      const _totalPersons = await fetch('/api/folks', {
+        method: 'POST',
+        body: JSON.stringify({ user }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await _totalPersons.json();
+      setTotalPersons(data.allcnt)
+      setTotalUserPeriod(total.curcnt);
+      let entry = 0;
+      let exit = 0;
+      total.logs.forEach(el => {
+        if (el.inout === 'Вход') entry += 1;
+        if (el.inout === 'Выход') exit += 1;
+      })
+      setTotalUserPeriodExit(exit)
+      setTotalUserPeriodEntry(entry)
       setUsers(res.logs);
     },
     {
@@ -377,7 +424,7 @@ function LogStudentsMonitoring({}) {
                       //variant="h4"
                       fontSize={14}
                   >
-                    1
+                    {totalUserPeriod}
                   </Typography>
                     </Grid>
                     <Grid sx={6} md={6}>
@@ -416,7 +463,7 @@ function LogStudentsMonitoring({}) {
                           variant="overline"
                           fontSize={8}
                       >
-                        Общее количество устройств (Всего)
+                        Общее количество распознаваний ВХОД (Сегодня)
                       </Typography><br/><br/>
                       <Grid container>
                         <Grid sx={6} md={6}>
@@ -425,7 +472,7 @@ function LogStudentsMonitoring({}) {
                               //variant="h4"
                               fontSize={14}
                           >
-                            1
+                            {totalUserPeriodEntry}
                           </Typography>
                         </Grid>
                         <Grid sx={6} md={6}>
@@ -436,7 +483,7 @@ function LogStudentsMonitoring({}) {
                                     width: 30
                                   }}
                           >
-                            <PeopleIcon />
+                            <InsertChartIcon />
                           </Avatar>
                         </Grid>
                       </Grid>
@@ -464,7 +511,7 @@ function LogStudentsMonitoring({}) {
                           variant="overline"
                           fontSize={8}
                       >
-                        Количество распознанных (Сегодня)
+                        Общее количество распознаваний ВЫХОД (Сегодня)
                       </Typography><br/><br/>
                       <Grid container>
                         <Grid sx={6} md={6}>
@@ -473,7 +520,7 @@ function LogStudentsMonitoring({}) {
                               //variant="h4"
                               fontSize={14}
                           >
-                            1
+                            {totalUserPeriodExit}
                           </Typography>
                         </Grid>
                         <Grid sx={6} md={6}>
@@ -512,7 +559,7 @@ function LogStudentsMonitoring({}) {
                           variant="overline"
                           fontSize={8}
                       >
-                        Количество нераспознанных (Сегодня)
+                        Общее количество пользователей
                       </Typography><br/><br/>
                       <Grid container>
                         <Grid sx={6} md={6}>
@@ -521,7 +568,7 @@ function LogStudentsMonitoring({}) {
                               //variant="h4"
                               fontSize={14}
                           >
-                            1
+                            {totalPersons}
                           </Typography>
                         </Grid>
                         <Grid sx={6} md={6}>
@@ -532,7 +579,7 @@ function LogStudentsMonitoring({}) {
                                     width: 30
                                   }}
                           >
-                            <InsertChartIcon />
+                            <PeopleIcon />
                           </Avatar>
                         </Grid>
                       </Grid>
@@ -549,7 +596,22 @@ function LogStudentsMonitoring({}) {
       </Grid>
       <div>
         <div className='grid-head'>
-          <h3>Последние вошедшие:</h3>
+          <h3>Последние вошедшие:&nbsp;&nbsp;&nbsp;
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DateTimePicker
+                label="Start date"
+                value={value}
+                onChange={handleChange}
+                renderInput={(params) => <TextField {...params} size="small"/>}
+            />&nbsp;&nbsp;&nbsp;
+              <DateTimePicker
+                  label="End date"
+                  value={value}
+                  onChange={handleChange}
+                  renderInput={(params) => <TextField {...params} size="small"/>}
+              />
+            </LocalizationProvider>
+          </h3>
           <Link href={`/logs`} passHref>
             <a>Посмотреть всех</a>
           </Link>

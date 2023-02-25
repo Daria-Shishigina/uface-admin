@@ -93,11 +93,12 @@ const ModalEdit = ({func}: any) => {
       return photo.status;
     }
   }
+
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .email('E-Mail должен быть правильным')
       .required('E-Mail обязателен'),
-    activated: Yup.bool(),
+    activated: Yup.number(),
     phone_approve: Yup.bool(),
     fio: Yup.string(),
     fname: Yup.string().required('Имя обязательно'),
@@ -109,22 +110,23 @@ const ModalEdit = ({func}: any) => {
     vuz_kod: Yup.string().required('Институт обязателен'),
   });
   // get functions to build form with useForm() hook
-  const formOptions = {
+  let formOptions = {
     resolver: yupResolver(validationSchema),
     defaultValues: {
       email: editUser?.email,
       fname: editUser?.fname,
-      activated: editUser?.activated,
-      phone_approve: parseInt(editUser?.phone_approve),
+      activated: parseInt(editUser?.activated),
+      phone_approve: 0,
       lname: editUser?.lname,
       sname: editUser?.sname,
       dateborn: moment(editUser?.dateborn, 'YYYY-MM-DD').format('DD.MM.YYYY'),
       phone: editUser?.phone,
       role_kod: editUser?.role_kod,
       vuz_kod: editUser?.vuz_kod,
-    },
+    }
   };
-  console.log(formOptions)
+
+
 
   const { register, handleSubmit, getValues, reset, formState } =
     useForm(formOptions);
@@ -142,8 +144,8 @@ const ModalEdit = ({func}: any) => {
   interface IData {
     login: string | null;
     password: string | null;
-    activated: string;
-    phone_approve: string;
+    activated: number;
+    phone_approve: number;
     photo: string;
     personid: string | undefined;
   }
@@ -736,10 +738,10 @@ const ModalEdit = ({func}: any) => {
                     <div>
                       <span>Email активирован: </span>
                       <input
-                        // @ts-ignore
-                        name='activated'
-                        type='checkbox'
-                        defaultChecked={parseInt(formOptions.defaultValues.activated)}
+                          // @ts-ignore
+                          name='activated'
+                          type='checkbox'
+                          {...register('activated')}
                       />
                     </div>
                   </div>
@@ -817,7 +819,7 @@ const ModalEdit = ({func}: any) => {
                         // @ts-ignore
                         name='phone_approve'
                         type='checkbox'
-                        defaultChecked={parseInt(formOptions.defaultValues.phone_approve)}
+                        {...register('phone_approve')}
                       />
                     </div>
                   </div>

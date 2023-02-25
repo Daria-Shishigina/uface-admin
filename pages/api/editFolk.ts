@@ -77,6 +77,7 @@ export default async function handler(
         };
 
         // console.log('activated: ' + folk.activated);
+        console.log(requestOptions.body)
         await fetch('https://uface.su/persident/processfolk', requestOptions)
             .then((response) => response.text())
             .then((result) => {

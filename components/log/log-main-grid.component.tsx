@@ -55,7 +55,7 @@ const getFormatedColumn = (filteredColumn: any[]) => {
         width: cs.width || 150,
         hide: cs.hide,
         renderCell: (params: any) => (
-          <span>{moment(params.value).format('DD.MM.YYYY  hh:mm:ss')}</span>
+          <span>{moment(params.value).format('DD.MM.YYYY  HH:mm:ss')}</span>
         ),
         // hide: true,
       });
@@ -181,7 +181,6 @@ const LogMainGrid = () => {
       ...formated,
     ];
     setColumns(formatedWithImage);
-
     if (res.status === 'success') {
       setUserList(res.logs);
       setMaxUsers(res.allcnt || 5);

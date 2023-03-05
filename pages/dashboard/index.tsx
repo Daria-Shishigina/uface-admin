@@ -247,7 +247,7 @@ function LogStudentsMonitoring({}) {
         body: JSON.stringify({
           login,
           password,
-          limit: '5',
+          limit: '1',
           offset: 0,
           getimg: true,
         }),
@@ -261,7 +261,8 @@ function LogStudentsMonitoring({}) {
         body: JSON.stringify({
           login,
           password,
-          from_d: moment().subtract(1, 'days').format('DD.MM.YYYY HH:mm:ss'),
+          // from_d: moment().subtract(1, 'days').format('DD.MM.YYYY HH:mm:ss'),
+          from_d: moment().startOf('day').format('DD.MM.YYYY HH:mm:ss'),
           to_d: moment().format('DD.MM.YYYY HH:mm:ss'),
         }),
         headers: {
@@ -356,7 +357,7 @@ function LogStudentsMonitoring({}) {
                 </div>
                 <div className='date'>
                   <div>Дата входа:</div>
-                  <Moment date={users[0]?.dt_log} subtract={{ hours: 12 }} format='DD.MM.YYYY HH:mm:ss' />
+                  <Moment date={users[0]?.dt_log} format='DD.MM.YYYY HH:mm:ss' />
                 </div>
               </div>
               <img
@@ -596,24 +597,24 @@ function LogStudentsMonitoring({}) {
       </Grid>
       <div>
         <div className='grid-head'>
-          <h3>Последние вошедшие:&nbsp;&nbsp;&nbsp;
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DateTimePicker
-                label="Start date"
-                value={value}
-                onChange={handleChange}
-                renderInput={(params) => <TextField {...params} size="small"/>}
-            />&nbsp;&nbsp;&nbsp;
-              <DateTimePicker
-                  label="End date"
-                  value={value}
-                  onChange={handleChange}
-                  renderInput={(params) => <TextField {...params} size="small"/>}
-              />
-            </LocalizationProvider>
+          <h3>Последние 50 проходов:&nbsp;&nbsp;&nbsp;
+            {/*<LocalizationProvider dateAdapter={AdapterDayjs}>*/}
+            {/*<DateTimePicker*/}
+            {/*    label="Start date"*/}
+            {/*    value={value}*/}
+            {/*    onChange={handleChange}*/}
+            {/*    renderInput={(params) => <TextField {...params} size="small"/>}*/}
+            {/*/>&nbsp;&nbsp;&nbsp;*/}
+            {/*  <DateTimePicker*/}
+            {/*      label="End date"*/}
+            {/*      value={value}*/}
+            {/*      onChange={handleChange}*/}
+            {/*      renderInput={(params) => <TextField {...params} size="small"/>}*/}
+            {/*  />*/}
+            {/*</LocalizationProvider>*/}
           </h3>
           <Link href={`/logs`} passHref>
-            <a>Посмотреть всех</a>
+            <a>Проходы за период</a>
           </Link>
         </div>
         <LogMainGrid />

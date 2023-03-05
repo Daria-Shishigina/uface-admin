@@ -18,6 +18,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import {DataGrid} from '@mui/x-data-grid';
+import Snackbar from '@mui/material/Snackbar';
 
 import {
   Box,
@@ -95,6 +96,21 @@ const styleSettings = {
   width: '70%',
   height: '75%',
 };
+
+const defaultFormValueState = {
+  cardAndPasswordPermission: 0,
+  faceAndCardPermission: 0,
+  faceAndPasswordPermission: 0,
+  facePermission: 1,
+  iDNumber: '',
+  role: 0,
+  type: 1,
+  idCardPermission: 0,
+  idcardNum: '',
+  Upassword: '',
+  passwordPermission: 0,
+  tag: ''
+}
 
 const PanelStyles = styled.div`
   display: flex;
@@ -554,6 +570,9 @@ const VisitorsGrid = ({setBlocking}) => {
   };
 
   const [tcolumns, setTcolumns] = useState<any[]>([]);
+  const [snackBarOpen, setSnackBarOpen] = useState(false);
+  const [snackBarText, setSnackBarText] = useState('');
+
   const { status, data: terminalsData, error, isFetching } = useQuery(
       'terminals',
       async () => {
@@ -632,20 +651,28 @@ const VisitorsGrid = ({setBlocking}) => {
     dataForSend.idCardPermission += 1;
     dataForSend.passwordPermission += 1;
 
-
     setBlocking(true)
     for (let i = 0; i < selectedBox.length; i++) {
       for (let s = 0; s < terminalsSelectedBox.length; s++) {
         let terminalUri = `http://${terminalsSelectedBox[s].ip}:${terminalsSelectedBox[s].port}`;
         let uri = (isSettings === true) ? '/api/personSettings' : `/api/${replicationType}`;
         let reqParam = {login, password, data: dataForSend, personid: selectedBox[i].personid, terminal: terminalUri};
-        await fetch(uri, {
+        let response = await fetch(uri, {
           method: 'POST',
           body: JSON.stringify({data: reqParam}),
           headers: {
             'Content-Type': 'application/json',
           }
         });
+        let body = JSON.parse(JSON.parse(await response.text()));
+        if ((isSettings) && (body.status !== 'error')) {
+          body.stateSet.forEach(el => {
+            if (el.state === '-1') {
+              if (!snackBarOpen) setSnackBarOpen(true)
+              setSnackBarText(el.desc);
+            }
+          })
+        }
       }
     }
     if ((curUser !== '') && (isSettings === true)) {
@@ -653,33 +680,30 @@ const VisitorsGrid = ({setBlocking}) => {
         let terminalUri = `http://${terminalsSelectedBox[s].ip}:${terminalsSelectedBox[s].port}`;
         let uri = '/api/personSettings';
         let reqParam = {login, password, data: dataForSend, personid: curUser, terminal: terminalUri};
-        await fetch(uri, {
+        let response = await fetch(uri, {
           method: 'POST',
           body: JSON.stringify({data: reqParam}),
           headers: {
             'Content-Type': 'application/json',
           }
         });
+        let body = JSON.parse(JSON.parse(await response.text()));
+        if ((isSettings) && (body.status !== 'error')) {
+          body.stateSet.forEach(el => {
+            if (el.state === '-1') {
+              if (!snackBarOpen) setSnackBarOpen(true)
+              setSnackBarText(el.desc);
+            }
+          })
+        }
       }
     }
+    setFormValues(defaultFormValueState)
     setCurUser('');
     setBlocking(false)
   }
 
-  const [formValues, setFormValues] = useState({
-    cardAndPasswordPermission: 0,
-    faceAndCardPermission: 0,
-    faceAndPasswordPermission: 0,
-    facePermission: 1,
-    iDNumber: '',
-    role: 0,
-    type: 1,
-    idCardPermission: 0,
-    idcardNum: '',
-    Upassword: '',
-    passwordPermission: 0,
-    tag: ''
-  });
+  const [formValues, setFormValues] = useState(JSON.parse(JSON.stringify(defaultFormValueState)));
 
   const handleChangeForm = name => event => {
     setFormValues({ ...formValues, [name]: event.target.checked });
@@ -689,7 +713,12 @@ const VisitorsGrid = ({setBlocking}) => {
       <>
 
         <PanelAndFilter canAddUser={canAddUser} setPerOpen={setPerOpen} handleOpen={handleOpen} updateAfterRemoveCheckboxes={updateAfterRemoveCheckboxes} />
-
+        <Snackbar
+            open={snackBarOpen}
+            autoHideDuration={6000}
+            onClose={() => setSnackBarOpen(false)}
+            message={snackBarText}
+        />
         <div style={{ height: '80vh' }}>
 
 

@@ -24,6 +24,7 @@ import {
   Modal,
 } from './modal-edit.styles';
 import WebCam from "react-webcam";
+import Checkbox from '@mui/material/Checkbox';
 
 let test = {};
 
@@ -98,7 +99,7 @@ const ModalEdit = ({func}: any) => {
     email: Yup.string()
       .email('E-Mail должен быть правильным')
       .required('E-Mail обязателен'),
-    activated: Yup.number(),
+    activated: Yup.bool(),
     phone_approve: Yup.bool(),
     fio: Yup.string(),
     fname: Yup.string().required('Имя обязательно'),
@@ -111,12 +112,12 @@ const ModalEdit = ({func}: any) => {
   });
   // get functions to build form with useForm() hook
   let formOptions = {
-    resolver: yupResolver(validationSchema),
+    // resolver: yupResolver(validationSchema),
     defaultValues: {
       email: editUser?.email,
       fname: editUser?.fname,
       activated: parseInt(editUser?.activated),
-      phone_approve: 0,
+      phone_approve: parseInt(editUser?.phone_approve),
       lname: editUser?.lname,
       sname: editUser?.sname,
       dateborn: moment(editUser?.dateborn, 'YYYY-MM-DD').format('DD.MM.YYYY'),
@@ -175,7 +176,7 @@ const ModalEdit = ({func}: any) => {
 
     data.login = login;
     data.password = password;
-    data.activated = `${data.activated}`;
+    data.activated = data.activated ? '1' : '0';
     data.phone_approve = data.phone_approve ? '1' : '0';
     data.photo = photo;
     data.onlyPwd = onlyPwd;
@@ -737,12 +738,16 @@ const ModalEdit = ({func}: any) => {
                     </div>
                     <div>
                       <span>Email активирован: </span>
-                      <input
-                          // @ts-ignore
-                          name='activated'
-                          type='checkbox'
+                      <Checkbox
                           {...register('activated')}
+                          defaultChecked={formOptions.defaultValues.activated}
                       />
+                      {/*<input*/}
+                      {/*    // @ts-ignore*/}
+                      {/*    name='activated'*/}
+                      {/*    type='checkbox'*/}
+                      {/*    {...register('activated')}*/}
+                      {/*/>*/}
                     </div>
                   </div>
                 </div>
@@ -815,11 +820,9 @@ const ModalEdit = ({func}: any) => {
                     </div>
                     <div>
                       <span>Телефон активирован: </span>
-                      <input
-                        // @ts-ignore
-                        name='phone_approve'
-                        type='checkbox'
-                        {...register('phone_approve')}
+                      <Checkbox
+                          {...register('phone_approve')}
+                          defaultChecked={formOptions.defaultValues.phone_approve}
                       />
                     </div>
                   </div>

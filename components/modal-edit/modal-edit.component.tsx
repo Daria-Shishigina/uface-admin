@@ -338,7 +338,7 @@ const ModalEdit = ({func}: any) => {
 
     const resData = await res.json();
 
-    console.log({ resData });
+    //console.log({ resData });
     setCopyResponse(resData);
     setCopyStatus(false);
   }

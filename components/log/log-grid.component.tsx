@@ -81,7 +81,7 @@ const LogGrid = () => {
     const [userList, setUserList] = useState<IStudent[]>([]);
 
     //Примитивный роутинг
-    const [limit, setLimit] = useState(1000);
+    const [limit, setLimit] = useState();
     const [offset, setOffset] = useState<number>(0);
     const [columns, setColumns] = useState<any[]>([]);
     const [pageSize, setPageSize] = useState<number>(20);
@@ -180,6 +180,7 @@ const LogGrid = () => {
                 'Content-Type': 'application/json',
             },
         });
+
         const dataFolks = await folks.json();
         const userData = { login, password, height: 200, pid: personId };
         const resPhoto = await fetch('/api/getPhotoFolk', {
@@ -190,8 +191,18 @@ const LogGrid = () => {
             },
         });
         const photo: any = await resPhoto.json();
+
+       //const logPhoto2 = await fetch('/api/getLogRecognition', {
+         //   method: 'POST',
+           // body: JSON.stringify({ login, password, limit, offset, getimg: true }),
+           // headers: {
+            //    'Content-Type': 'application/json',
+           // },
+        //}).then((result) => result.json());
+
         setModalData({
             // value: params?.value,
+            //value: logPhoto2.logs?.[0].image,
             id: dataFolks?.folks?.[0]?.id,
             fio: dataFolks?.folks?.[0]?.fio,
             base_photo: (photo.status === 'success') ? photo?.photos[0]?.base64 || '' : '',
@@ -264,7 +275,8 @@ const LogGrid = () => {
                     <br/>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DateTimePicker
-                            label="Start date"
+                            inputFormat={'DD.MM.YYYY HH:mm'}
+                            label="C:"
                             ampm={false}
                             value={startDate}
                             onChange={(val) => {
@@ -273,7 +285,8 @@ const LogGrid = () => {
                             renderInput={(params) => <TextField {...params} size="small"/>}
                         />&nbsp;&nbsp;&nbsp;
                         <DateTimePicker
-                            label="End date"
+                            inputFormat={'DD.MM.YYYY HH:mm'}
+                            label="По:"
                             ampm={false}
                             value={endDate}
                             onChange={(val) => {
@@ -283,7 +296,7 @@ const LogGrid = () => {
                         />
                     </LocalizationProvider>&nbsp;&nbsp;&nbsp;
                     <Button variant="contained" size="small" onClick={getLogs}
-                            style={{marginTop: '5px'}}>Submit</Button>
+                            style={{marginTop: '5px'}}>Отобразить</Button>
                     <br/><br/>
                 </Grid>
                 <Grid item xs={4} md={4}>

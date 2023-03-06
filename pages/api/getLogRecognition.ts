@@ -40,6 +40,9 @@ export default async function handler(
   if (req.body.getimg !== undefined) urlencoded.append('getimg', req.body.getimg);
   if (req.body.from_d !== undefined) urlencoded.append('from_d', req.body.from_d);
   if (req.body.to_d !== undefined) urlencoded.append('to_d', req.body.to_d);
+  if (req.body.width !== undefined) urlencoded.append('width', req.body.width);
+  if (req.body.height !== undefined) urlencoded.append('height', req.body.height);
+  if (req.body.id !== undefined) urlencoded.append('id', req.body.id);
 
   var requestOptions: IReqOption = {
     method: 'POST',
@@ -48,6 +51,8 @@ export default async function handler(
     redirect: 'follow',
     agent: httpsAgent,
   };
+
+    //console.log({requestOptions});
 
   await fetch('https://uface.su/persident/getlogrecognition', requestOptions)
     .then((response) => response.text())

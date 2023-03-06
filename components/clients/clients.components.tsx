@@ -153,7 +153,7 @@ const TableRow = ({
       },
     });
 
-    console.log({ delFunc });
+    //console.log({ delFunc });
   };
 
   return (

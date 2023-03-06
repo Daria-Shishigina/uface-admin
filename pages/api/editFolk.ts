@@ -77,7 +77,7 @@ export default async function handler(
         };
 
         // console.log('activated: ' + folk.activated);
-        console.log(requestOptions.body)
+        //console.log(requestOptions.body)
         await fetch('https://uface.su/persident/processfolk', requestOptions)
             .then((response) => response.text())
             .then((result) => {
@@ -94,7 +94,7 @@ export default async function handler(
             pwd
         } = req.body.data;
 
-        console.log(req.body.data);
+        //console.log(req.body.data);
         const pid = personid;
         let loginHeaders = new Headers();
         loginHeaders.append('Content-Type', 'application/x-www-form-urlencoded');

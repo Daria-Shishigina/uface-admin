@@ -102,7 +102,7 @@ const LogMainGrid = () => {
     let login = sessionStorage.getItem('login');
     let password = sessionStorage.getItem('password');
     let pid = params.row.personId;
-    const user = {login, password, pid};
+    const user = {login, password, pid, height: 200};
     const folks = await fetch('/api/folks', {
       method: 'POST',
       body: JSON.stringify({ user }),
@@ -123,16 +123,39 @@ const LogMainGrid = () => {
     // console.log(params?.value)
     const dataFolks = await folks.json();
     console.log(dataFolks)
-    setImgsrc({
-      value: params?.value,
-      id: dataFolks?.folks?.[0]?.id,
-      fio: dataFolks?.folks?.[0]?.fio,
-      base_photo: (photo.status === 'success') ? photo?.photos[0]?.base64 || '' : '',
-      phone: dataFolks?.folks?.[0]?.phone,
-      email: dataFolks?.folks?.[0]?.email,
-      dt_log: moment(params?.row?.dt_log).format('DD.MM.YYYY HH:mm:ss'),
-      dateborn: moment(dataFolks?.folks?.[0]?.dateborn).format('DD.MM.YYYY')
-    });
+
+    console.log(params.id)
+//test
+      const logPhoto = await fetch('/api/getLogRecognition', {
+          method: 'POST',
+          body: JSON.stringify({ login, password, limit, offset, getimg: true, id: params.id}),
+          headers: {
+              'Content-Type': 'application/json',
+          },
+      }).then((result) => result.json());
+      // let logPhotoResponse = await logPhoto.json();
+      console.log(logPhoto)
+      setImgsrc({
+          value: logPhoto?.logs?.[0]?.image,
+          id: dataFolks?.folks?.[0]?.id,
+          fio: dataFolks?.folks?.[0]?.fio,
+          base_photo: (photo.status === 'success') ? photo?.photos[0]?.base64 || '' : '',
+          phone: dataFolks?.folks?.[0]?.phone,
+          email: dataFolks?.folks?.[0]?.email,
+          dt_log: moment(params?.row?.dt_log).format('DD.MM.YYYY HH:mm:ss'),
+          dateborn: moment(dataFolks?.folks?.[0]?.dateborn).format('DD.MM.YYYY')
+      });
+
+    //setImgsrc({
+    //  value: params?.value,
+    //  id: dataFolks?.folks?.[0]?.id,
+    //  fio: dataFolks?.folks?.[0]?.fio,
+    //  base_photo: (photo.status === 'success') ? photo?.photos[0]?.base64 || '' : '',
+    //  phone: dataFolks?.folks?.[0]?.phone,
+    //  email: dataFolks?.folks?.[0]?.email,
+    //  dt_log: moment(params?.row?.dt_log).format('DD.MM.YYYY HH:mm:ss'),
+    //  dateborn: moment(dataFolks?.folks?.[0]?.dateborn).format('DD.MM.YYYY')
+    //});
     setOpen(true);
   }
   const handleClose = () => setOpen(false);
@@ -143,7 +166,7 @@ const LogMainGrid = () => {
 
     const res = await fetch('/api/getLogRecognition', {
       method: 'POST',
-      body: JSON.stringify({ login, password, limit, offset, getimg: true }),
+      body: JSON.stringify({ login, password, limit, offset, getimg: true, height: 50 }),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -196,13 +219,13 @@ const LogMainGrid = () => {
       let password = sessionStorage.getItem('password');
       const res = await fetch('/api/getLogRecognition', {
         method: 'POST',
-        body: JSON.stringify({ login, password, limit, offset, getimg: true }),
+        body: JSON.stringify({ login, password, limit, offset, getimg: true, height: 50 }),
         headers: {
           'Content-Type': 'application/json',
         },
       }).then((result) => result.json());
 
-      // console.log({ res });
+      //console.log({ res });
       let users = res.logs;
       users.map((item: any) => {
         if (item.image === '<empty>') {

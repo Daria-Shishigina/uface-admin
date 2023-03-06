@@ -270,7 +270,7 @@ function LogStudentsMonitoring({}) {
         },
       }).then((result) => result.json());
 
-      const user = { login, password, limit: 10000, offset: 0 };
+      const user = { login, password, limit: 10000, offset: 0};
       const _totalPersons = await fetch('/api/folks', {
         method: 'POST',
         body: JSON.stringify({ user }),
@@ -297,7 +297,7 @@ function LogStudentsMonitoring({}) {
     }
   );
 
-  // console.log({ users, photo });
+  //console.log({ users, photo });
 
   useEffect(() => {
     if (users?.length > 0 && listProp.length === 0) {

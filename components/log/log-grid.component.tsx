@@ -148,7 +148,7 @@ const LogGrid = () => {
                 renderCell: (params: any) => {
                     const perSettings = async (e: any) => {
                         e.stopPropagation();
-                        await updatePersonUserData(params.row.personId)
+                        await updatePersonUserData(params.row.personId, params.row.id, params.row.dt_log)
                         setOpen(true)
                     };
 
@@ -169,7 +169,7 @@ const LogGrid = () => {
         }
     };
 
-    async function updatePersonUserData(personId) {
+    async function updatePersonUserData(personId, id, dt_log) {
         let login = sessionStorage.getItem('login');
         let password = sessionStorage.getItem('password');
         const user = {login, password, pid: personId};
@@ -192,23 +192,23 @@ const LogGrid = () => {
         });
         const photo: any = await resPhoto.json();
 
-       //const logPhoto2 = await fetch('/api/getLogRecognition', {
-         //   method: 'POST',
-           // body: JSON.stringify({ login, password, limit, offset, getimg: true }),
-           // headers: {
-            //    'Content-Type': 'application/json',
-           // },
-        //}).then((result) => result.json());
+       const logPhoto = await fetch('/api/getLogRecognition', {
+            method: 'POST',
+            body: JSON.stringify({ login, password, limit, offset, getimg: true, id: id}),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then((result) => result.json());
 
         setModalData({
             // value: params?.value,
-            //value: logPhoto2.logs?.[0].image,
+            value: logPhoto.logs?.[0].image,
             id: dataFolks?.folks?.[0]?.id,
             fio: dataFolks?.folks?.[0]?.fio,
             base_photo: (photo.status === 'success') ? photo?.photos[0]?.base64 || '' : '',
             phone: dataFolks?.folks?.[0]?.phone,
             email: dataFolks?.folks?.[0]?.email,
-            // dt_log: moment(params?.row?.dt_log).format('DD.MM.YYYY HH:mm:ss'),
+            dt_log: moment(dt_log).format('DD.MM.YYYY HH:mm:ss'),
             dateborn: moment(dataFolks?.folks?.[0]?.dateborn).format('DD.MM.YYYY')
         });
     }

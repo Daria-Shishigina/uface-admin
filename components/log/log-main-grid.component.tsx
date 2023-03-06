@@ -124,7 +124,7 @@ const LogMainGrid = () => {
     const dataFolks = await folks.json();
     console.log(dataFolks)
 
-    console.log(params.id)
+    //console.log(params.id)
 //test
       const logPhoto = await fetch('/api/getLogRecognition', {
           method: 'POST',

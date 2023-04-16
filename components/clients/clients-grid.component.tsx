@@ -665,12 +665,16 @@ const VisitorsGrid = ({setBlocking}) => {
           }
         });
         let body = JSON.parse(JSON.parse(await response.text()));
+        if (isSettings === false) {
+          if (!snackBarOpen) setSnackBarOpen(true)
+          setSnackBarText(body.status);
+        }
         if ((isSettings) && (body.status !== 'error')) {
           body.stateSet.forEach(el => {
-            if (el.state === '-1') {
+            //if (el.state === '-1') {
               if (!snackBarOpen) setSnackBarOpen(true)
               setSnackBarText(el.desc);
-            }
+           // }
           })
         }
       }
@@ -688,12 +692,16 @@ const VisitorsGrid = ({setBlocking}) => {
           }
         });
         let body = JSON.parse(JSON.parse(await response.text()));
+        if (isSettings === false) {
+          if (!snackBarOpen) setSnackBarOpen(true)
+          setSnackBarText(body.status);
+        }
         if ((isSettings) && (body.status !== 'error')) {
           body.stateSet.forEach(el => {
-            if (el.state === '-1') {
+            //if (el.state === '-1') {
               if (!snackBarOpen) setSnackBarOpen(true)
               setSnackBarText(el.desc);
-            }
+            //}
           })
         }
       }

@@ -15,8 +15,8 @@ import Moment from 'react-moment';
 const style = {
   position: 'absolute' as 'absolute',
   top: '15%',
-  left: '12%',
-  width: '76%',
+  left: '7%',
+  width: '84%',
   height: '70%',
 };
 
@@ -257,19 +257,21 @@ const LogMainGrid = () => {
           <h2 id="parent-modal-title" style={{marginLeft: '20px'}}>ID: {imgsrc.id}</h2>
           <hr/>
           <Grid container spacing={0}>
-            <Grid item xs={4} style={{marginLeft: '20px'}}>
-              <img src = {imgsrc.value} style={{height: '80%', width: '80%'}}/>
+            <Grid item xs={2} style={{marginLeft: '20px'}}>
+              <img src = {imgsrc.value} style={{height: '318px'}}/>
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={2}>
               {imgsrc.base_photo !== '' ? (
-                  <img src = {imgsrc.base_photo} style={{height: '80%', width: '80%'}}/>
+                  <img src = {imgsrc.base_photo} style={{height: '318px'}}/>
               ) : (
                   <span>
                     Нет в базе
                   </span>
               )}
             </Grid>
-            <Grid item xs={3} style={{marginLeft: '20px'}}>
+            <Grid item xs={3}>
+            </Grid>
+            <Grid item xs={4} style={{marginLeft: '20px'}}>
               <Typography sx={{ wordBreak: "break-word" }}>
                 <strong>Распознование: </strong><br/>{(imgsrc.fio === undefined) ? 'Не распознан' : 'Распознан'}
               </Typography><br/>

@@ -283,17 +283,18 @@ function LogStudentsMonitoring({}) {
       setTotalUserPeriod(total.curcnt);
       let entry = 0;
       let exit = 0;
-      total.logs.forEach(el => {
+      (total.logs || []).forEach(el => {
         if (el.inout === 'Вход') entry += 1;
         if (el.inout === 'Выход') exit += 1;
       })
       setTotalUserPeriodExit(exit)
       setTotalUserPeriodEntry(entry)
       setUsers(res.logs);
+      getPhoto(users[0]?.personId)
     },
     {
       // Время повторного запроса: 1 сек = 1 • 1000мс
-      // refetchInterval: 1000,
+       refetchInterval: 20000,
     }
   );
 

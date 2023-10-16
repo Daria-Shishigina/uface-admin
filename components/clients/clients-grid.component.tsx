@@ -134,7 +134,7 @@ const PanelStyles = styled.div`
 let selectedBox = [];
 let terminalsSelectedBox = [];
 
-const PanelAndFilter = ({ canAddUser, setPerOpen, handleOpen, updateAfterRemoveCheckboxes }: { canAddUser: boolean, updateAfterRemoveCheckboxes: any }) => {
+const PanelAndFilter = ({ canAddUser,openPersonalSettings, setPerOpen, handleOpen, updateAfterRemoveCheckboxes }: { canAddUser: boolean, updateAfterRemoveCheckboxes: any }) => {
   const { setEditUser } = useGlobalContext();
 
   return (
@@ -176,7 +176,8 @@ const PanelAndFilter = ({ canAddUser, setPerOpen, handleOpen, updateAfterRemoveC
         {canAddUser && (
             <button
                 type='button'
-                onClick={() => setPerOpen(true)}
+                onClick={() => openPersonalSettings()}
+                // onClick={() => setPerOpen(true)}
             >
               Персональные настройки
             </button>
@@ -341,6 +342,11 @@ const VisitorsGrid = ({setBlocking}) => {
     if (selectedBox.length === 0) return alert('Выберите пользователей')
     setOpen(true);
   }
+  const openPersonalSettings = () => {
+    if (selectedBox.length === 0) return alert('Выберите пользователей')
+    setPerOpen(true);
+  }
+
   const handleClose = () => {
     setOpen(false);
     setPerOpen(false)
@@ -747,7 +753,7 @@ const VisitorsGrid = ({setBlocking}) => {
   return (
       <>
 
-        <PanelAndFilter canAddUser={canAddUser} setPerOpen={setPerOpen} handleOpen={handleOpen} updateAfterRemoveCheckboxes={updateAfterRemoveCheckboxes} />
+        <PanelAndFilter canAddUser={canAddUser} openPersonalSettings={openPersonalSettings} setPerOpen={setPerOpen} handleOpen={handleOpen} updateAfterRemoveCheckboxes={updateAfterRemoveCheckboxes} />
         <Snackbar
             open={snackBarOpen}
             autoHideDuration={6000}
@@ -870,16 +876,70 @@ const VisitorsGrid = ({setBlocking}) => {
                       </Box>
                     </Grid>
                     <Grid item xs={6}>
-                      {terminalsData?.[0].dkey}
+                      {/*{terminalsData?.[0].dkey}*/}
+
+
+                      <FormControlLabel control={<Checkbox/>} onChange={handleChangeForm("cardAndPasswordPermission")} label="Card and password permission" />
+                      <br/>
+                      <FormControlLabel control={<Checkbox />} onChange={handleChangeForm("faceAndCardPermission")} label="Face and card permission" />
+                      <br/>
+                      <FormControlLabel control={<Checkbox />} onChange={handleChangeForm("faceAndPasswordPermission")} label="Face and password permission" />
+                      <br/>
+                      <FormControlLabel control={<Checkbox defaultChecked/>} onChange={handleChangeForm("facePermission")} label="Face permission" />
+                      <br/>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label='Id number'
+                        onChange={handleChangeForm("iDNumber")}
+                      /><br/><br/>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        type="number"
+                        defaultValue={0}
+                        label='Role'
+                        onChange={handleChangeForm("role")}
+                      /><br/><br/>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        type="number"
+                        defaultValue={1}
+                        label='Type'
+                        onChange={handleChangeForm("type")}
+                      /><br/><br/>
+
+                      <TextField
+                        fullWidth
+                        size="small"
+                        onChange={handleChangeForm("idcardNum")}
+                        label='Id card number'
+                      /><br/>
+                      <FormControlLabel control={<Checkbox/>} onChange={handleChangeForm("idCardPermission")} label="Id card permission" />
+                      <br/>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label='Password'
+                        onChange={handleChangeForm("Upassword")}
+                      /><br/>
+                      <FormControlLabel control={<Checkbox/>} onChange={handleChangeForm("passwordPermission")} label="Password permission" />
+                      <br/>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label='Tag'
+                        onChange={handleChangeForm("tag")}
+                      /><br/><br/>
+                      <Button variant="contained">Загрузить данные</Button> &nbsp;
+                      <Button variant="contained" >Переустановить на терминалах</Button><br/>
                     </Grid>
                   </Grid>
                 </FormGroup>
               </div><br/>
             </Box>
           </Modal>
-
-
-
 
           <Modal
               open={open}

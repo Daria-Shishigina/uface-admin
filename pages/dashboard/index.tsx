@@ -215,26 +215,26 @@ function LogStudentsMonitoring({}) {
   };
 
   async function getPhoto(pid: string) {
-    let login = sessionStorage.getItem('login');
-    let password = sessionStorage.getItem('password');
-    let height = 200;
-
-    const userData = { login, password, height, pid };
-    const resPhoto = await fetch('/api/getPhotoFolk', {
-      method: 'POST',
-      body: JSON.stringify({ userData }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const photo: any = await resPhoto.json();
-
-    if (photo.status === 'success') {
-      // return photo.photos[0].base64;
-      setPhoto(photo?.photos[0]?.base64 || '');
-    } else {
-      setPhoto('');
-    }
+    // let login = sessionStorage.getItem('login');
+    // let password = sessionStorage.getItem('password');
+    // let height = 200;
+    //
+    // const userData = { login, password, height, pid };
+    // const resPhoto = await fetch('/api/getPhotoFolk', {
+    //   method: 'POST',
+    //   body: JSON.stringify({ userData }),
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    // });
+    // const photo: any = await resPhoto.json();
+    //
+    // if (photo.status === 'success') {
+    //   // return photo.photos[0].base64;
+    //   setPhoto(photo?.photos[0]?.base64 || '');
+    // } else {
+    //   setPhoto('');
+    // }
   }
 
   const { status, data, error, isFetching } = useQuery(
@@ -248,13 +248,21 @@ function LogStudentsMonitoring({}) {
           login,
           password,
           limit: '1',
+          getdbimg: true,
           offset: 0,
           getimg: true,
+          height: 318,
         }),
         headers: {
           'Content-Type': 'application/json',
         },
       }).then((result) => result.json());
+      if (res?.logs?.[0]?.imagedb) {
+        setPhoto(res?.logs?.[0]?.imagedb);
+      } else {
+        setPhoto('');
+      }
+
 
       let total = await fetch('/api/getLogRecognition', {
         method: 'POST',
@@ -290,7 +298,7 @@ function LogStudentsMonitoring({}) {
       setTotalUserPeriodExit(exit)
       setTotalUserPeriodEntry(entry)
       setUsers(res.logs);
-      getPhoto(users[0]?.personId)
+      // getPhoto(users[0]?.personId)
     },
     {
       // Время повторного запроса: 1 сек = 1 • 1000мс
@@ -309,7 +317,7 @@ function LogStudentsMonitoring({}) {
         setListProp(newListProp);
       });
 
-      getPhoto(users[0].personId);
+      // getPhoto(users[0].personId);
 
       let newListProp = listProp;
       newListProp[8].property = '';

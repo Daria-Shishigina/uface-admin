@@ -465,8 +465,8 @@ const VisitorsGrid = ({setBlocking}) => {
       },
     });
     const data = await res.json();
-    console.log(123321)
-    console.log(data)
+    // console.log(123321)
+    // console.log(data)
 
     const columnsReq = await fetch('/api/column-names', {
       method: 'POST',
@@ -517,6 +517,16 @@ const VisitorsGrid = ({setBlocking}) => {
             setClients(data.folks);
           };
 
+          const multiplySettings = async (e: any) => {
+            e.stopPropagation();
+
+            const login = sessionStorage.getItem('login');
+            const password = sessionStorage.getItem('password');
+            setBlocking(true);
+            await setMultiplySettingsModalData(e);
+            setBlocking(false)
+          }
+
           const perSettings = async (e: any) => {
             e.stopPropagation();
 
@@ -551,7 +561,7 @@ const VisitorsGrid = ({setBlocking}) => {
                 <IconButton aria-label='Удалить' onClick={deleteFolk}>
                   <DeleteIcon />
                 </IconButton>
-                <IconButton aria-label='Тиражирование' onClick={replication}>
+                <IconButton aria-label='Тиражирование' onClick={multiplySettings}>
                   <ArrowOutwardIcon />
                 </IconButton>
                 <IconButton aria-label='Персональный настройки' onClick={perSettings}>
@@ -572,6 +582,9 @@ const VisitorsGrid = ({setBlocking}) => {
   const [tcolumns, setTcolumns] = useState<any[]>([]);
   const [snackBarOpen, setSnackBarOpen] = useState(false);
   const [snackBarText, setSnackBarText] = useState('');
+  const [multiplySettingsModal, setMultiplySettingsModal] = useState(false);
+  const [selectionModel, setSelectionModel] = useState([]);
+  const [previousSelection, setPreviousSelection] = useState([]);
 
   const { status, data: terminalsData, error, isFetching } = useQuery(
       'terminals',
@@ -596,18 +609,20 @@ const VisitorsGrid = ({setBlocking}) => {
           },
         });
         const column = await columnsReq.json();
-        console.log({column});
+        // console.log({column});
         const filteredColumn = column?.clmns.filter(
             (item: any) => item.keyTable === 'terminals'
         );
-
         const formated = getFormatedTColumn(filteredColumn);
         setTcolumns(formated);
-        console.log({resData});
         return resData.terms;
         // return res.terms;
       }
   );
+
+  const setMultiplySettingsModalData = async (e) => {
+    setMultiplySettingsModal(true);
+  }
 
   const onRowsSelectionHandler = (ids) => {
     selectedBox = [];
@@ -621,6 +636,14 @@ const VisitorsGrid = ({setBlocking}) => {
     ids.forEach(id => {
       terminalsSelectedBox.push(terminalsData.find(el => el.id === id));
     })
+  };
+
+  const onTerminalsSelectionSingle = (newSelection) => {
+    setSelectionModel(newSelection)
+    setPreviousSelection(newSelection)
+    const newSelectionSet = newSelection.filter((element) => !previousSelection.includes(element));
+    setSelectionModel(newSelectionSet)
+    setPreviousSelection(newSelectionSet)
   };
 
   // Update
@@ -652,6 +675,8 @@ const VisitorsGrid = ({setBlocking}) => {
     dataForSend.passwordPermission += 1;
 
     setBlocking(true)
+    const totalReqCount: number = (selectedBox?.length || 1) * (terminalsSelectedBox?.length || 1);
+    let reqPassed: number = 0;
     for (let i = 0; i < selectedBox.length; i++) {
       for (let s = 0; s < terminalsSelectedBox.length; s++) {
         let terminalUri = `http://${terminalsSelectedBox[s].ip}:${terminalsSelectedBox[s].port}`;
@@ -664,11 +689,13 @@ const VisitorsGrid = ({setBlocking}) => {
             'Content-Type': 'application/json',
           }
         });
-        let body = JSON.parse(JSON.parse(await response.text()));
-        if (isSettings === false) {
+        reqPassed += 1;
+        let body = JSON.parse(await response.text());
+        // if (isSettings === false) {
           if (!snackBarOpen) setSnackBarOpen(true)
-          setSnackBarText(body.status);
-        }
+          setSnackBarText(`Person - ${selectedBox[i].fio};\nTerminal - ${terminalsSelectedBox[s].ip};\nPassed - ${reqPassed} / ${totalReqCount}`);
+          // setSnackBarText(body.status);
+        // }
         if ((isSettings) && (body.status !== 'error')) {
           body.stateSet.forEach(el => {
             //if (el.state === '-1') {
@@ -691,7 +718,7 @@ const VisitorsGrid = ({setBlocking}) => {
             'Content-Type': 'application/json',
           }
         });
-        let body = JSON.parse(JSON.parse(await response.text()));
+        let body = JSON.parse(await response.text());
         if (isSettings === false) {
           if (!snackBarOpen) setSnackBarOpen(true)
           setSnackBarText(body.status);
@@ -814,6 +841,42 @@ const VisitorsGrid = ({setBlocking}) => {
             </Box>
           </Modal>
 
+
+
+          <Modal
+              open={multiplySettingsModal}
+              onClose={() => (setMultiplySettingsModal(false))}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+          >
+            <Box sx={{...styleSettings}} style={{backgroundColor: 'white'}}>
+              <h2 id="parent-modal-title" style={{marginLeft: '10px', marginTop: '10px'}}>Пользовательские настройки</h2><hr/>
+              <div>
+                <FormGroup>
+                  <Grid container spacing={1}>
+                    <Grid item xs={6} md={6}>
+                      <Box style={{backgroundColor: 'white', width: '50%', height: '89%', position: 'absolute',}}>
+                      <DataGrid
+                          style={{ backgroundColor: 'white' }}
+                          rows={terminalsData}
+                          columns={tcolumns}
+                          localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
+                          checkboxSelection
+                          selectionModel={selectionModel}
+                          onSelectionModelChange={(ids) => onTerminalsSelectionSingle(ids)}
+                          disableSelectionOnClick
+                          hideFooterPagination
+                      />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={6}>
+                      {terminalsData?.[0].dkey}
+                    </Grid>
+                  </Grid>
+                </FormGroup>
+              </div><br/>
+            </Box>
+          </Modal>
 
 
 

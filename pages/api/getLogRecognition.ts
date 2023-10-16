@@ -42,6 +42,7 @@ export default async function handler(
   if (req.body.to_d !== undefined) urlencoded.append('to_d', req.body.to_d);
   if (req.body.width !== undefined) urlencoded.append('width', req.body.width);
   if (req.body.height !== undefined) urlencoded.append('height', req.body.height);
+  if (req.body.getdbimg !== undefined) urlencoded.append('getdbimg', req.body.getdbimg);
   if (req.body.id !== undefined) urlencoded.append('id', req.body.id);
 
   var requestOptions: IReqOption = {

@@ -263,6 +263,7 @@ function LogStudentsMonitoring({}) {
         setPhoto('');
       }
 
+      // console.log(password);
 
       let total = await fetch('/api/getLogRecognition', {
         method: 'POST',
@@ -369,11 +370,29 @@ function LogStudentsMonitoring({}) {
                   <Moment date={users[0]?.dt_log} format='DD.MM.YYYY HH:mm:ss' />
                 </div>
               </div>
+
+              {users[0].image !== '' ? (
               <img
                   src={users[0].image}
                   height={318}
                   alt='Изображение с терминала'
               />
+              ) : (
+                <img src = '/images/img_usr.png' style={{height: '318px'}}/>
+                // <div
+                //   style={{
+                //     height: 318,
+                //     width: 200,
+                //     display: 'flex',
+                //     justifyContent: 'center',
+                //     alignItems: 'center',
+                //     marginLeft: 10,
+                //   }}
+                // >
+                //   <div id="photoNotFound" style={{display: photoNotFound}}>Фото отсутствует</div>
+                // </div>
+              )}
+
               {photo !== '' ? (
                   <img
                       src={photo}
@@ -382,18 +401,19 @@ function LogStudentsMonitoring({}) {
                       alt='Изображение с терминала'
                   />
               ) : (
-                  <div
-                      style={{
-                        height: 318,
-                        width: 200,
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginLeft: 10,
-                      }}
-                  >
-                    <div id="photoNotFound" style={{display: photoNotFound}}>Нет в базе</div>
-                  </div>
+                <img src = '/images/img_usr.png' style={{height: '318px', marginLeft: 10}}/>
+                  // <div
+                  //     style={{
+                  //       height: 318,
+                  //       width: 200,
+                  //       display: 'flex',
+                  //       justifyContent: 'center',
+                  //       alignItems: 'center',
+                  //       marginLeft: 10,
+                  //     }}
+                  // >
+                  //   <div id="photoNotFound" style={{display: photoNotFound}}>Нет в базе</div>
+                  // </div>
               )}
             </LastEntered>
             {/*<div>*/}

@@ -136,7 +136,7 @@ const LogMainGrid = () => {
       // let logPhotoResponse = await logPhoto.json();
       console.log(logPhoto)
       setImgsrc({
-          value: logPhoto?.logs?.[0]?.image,
+          value:  logPhoto?.logs?.[0]?.image,
           id: dataFolks?.folks?.[0]?.id,
           fio: dataFolks?.folks?.[0]?.fio,
           base_photo: (photo.status === 'success') ? photo?.photos[0]?.base64 || '' : '',
@@ -245,6 +245,8 @@ const LogMainGrid = () => {
     getLogs();
   }, []);
 
+  console.log(imgsrc)
+
   return (
     <div>
       <Modal
@@ -258,15 +260,19 @@ const LogMainGrid = () => {
           <hr/>
           <Grid container spacing={0}>
             <Grid item xs={2} style={{marginLeft: '20px'}}>
+              {imgsrc.value !== '<empty>' ? (
               <img src = {imgsrc.value} style={{height: '318px'}}/>
+              ) : (
+                <img src = '/images/img_usr.png' style={{height: '318px'}}/>
+                // <span>Отсутствует фото с терминала</span>
+              )}
             </Grid>
             <Grid item xs={2}>
               {imgsrc.base_photo !== '' ? (
                   <img src = {imgsrc.base_photo} style={{height: '318px'}}/>
               ) : (
-                  <span>
-                    Нет в базе
-                  </span>
+                  // <span>Нет в базе</span>
+                <img src = '/images/img_usr.png' style={{height: '318px'}}/>
               )}
             </Grid>
             <Grid item xs={3}>

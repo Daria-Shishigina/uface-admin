@@ -7,12 +7,18 @@ import {
   GridToolbar,
   ruRU,
 } from '@mui/x-data-grid-pro';
-import { CircularProgress } from '@mui/material';
+import {CircularProgress, TextField, Typography} from '@mui/material';
+
+import FormGroup from '@mui/material/FormGroup';
+import {DataGrid} from '@mui/x-data-grid';
+import Grid from "@mui/material/Grid";
 
 import { Table } from 'react-bootstrap';
 import { Tr } from 'components/clients/clients.styles';
 
 import { useQuery } from 'react-query';
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
 
 // interface ITerminal {
 //   id: string;
@@ -87,6 +93,9 @@ export default function TerminalsGrid() {
 
   return (
     <div>
+      <FormGroup>
+        <Grid container spacing={1}>
+          <Grid item xs={6} md={6}>
       <h1>Список терминалов</h1>
       <div style={{ height: '80vh' }}>
           {columns.length === 0 ? <CircularProgress style={{ marginLeft: '50%', marginTop: '10%'}}/> :
@@ -121,6 +130,36 @@ export default function TerminalsGrid() {
           }}
         /> }
       </div>
+          </Grid>
+          <Grid item xs={6}>
+            <br/><br/><br/>
+              <TextField
+                fullWidth size="small" // onChange={}
+                label='CardMicroVersion'/><br/>
+
+
+
+            <Typography sx={{wordBreak: "break-word"}}>
+              "CardMicroVersion": "", <br/>
+              "SDKVersion": "v0.1.1.462eb-1211028.256-20220530-uface_D_E.3.109.1.6",<br/>
+              "cpuTemperature": "41.043506",<br/>
+              "cpuUsageRate": "53.278000%",<br/>
+              "deviceKey": "84E0F426D672527A",<br/>
+              "faceCount": "10351",<br/>
+              "freeDiskSpace": "5159M",<br/>
+              "ip": "192.168.0.123",<br/>
+              "languageType": "ru",<br/>
+              "memoryUsageRate": "31.075153%",<br/>
+              "personCount": "5957",<br/>
+              "time": "1697530436546",<br/>
+              "timeZone": "GMT+7",<br/>
+              "version": "GD-V32.7302"<br/>
+            </Typography><br/>
+
+
+          </Grid>
+        </Grid>
+      </FormGroup>
     </div>
   );
 }

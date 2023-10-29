@@ -234,20 +234,24 @@ const LogGrid = () => {
                     <hr/>
                     <Grid container spacing={0}>
                         <Grid item xs={4} style={{marginLeft: '20px'}}>
+                            {modalData.value !== '<empty>' ? (
                             <img src={modalData.value} style={{height: '80%', width: '80%'}}/>
+                            ) : (
+                              <img src = '/images/img_usr.png' style={{height: '80%', width: '80%'}}/>
+                              // <span>Отсутствует фото с терминала</span>
+                            )}
                         </Grid>
                         <Grid item xs={4}>
                             {modalData.base_photo !== '' ? (
                                 <img src={modalData.base_photo} style={{height: '80%', width: '80%'}}/>
                             ) : (
-                                <span>
-                    Нет в базе
-                  </span>
+                                // <span>Нет в базе</span>
+                              <img src = '/images/img_usr.png' style={{height: '80%', width: '80%'}}/>
                             )}
                         </Grid>
                         <Grid item xs={3} style={{marginLeft: '20px'}}>
                             <Typography sx={{wordBreak: "break-word"}}>
-                                <strong>Распознование: </strong><br/>{(modalData.fio === undefined) ? 'Не распознан' : 'Распознан'}
+                                <strong>Распознование:</strong><br/>{(modalData.fio === undefined) ? 'Не распознан' : 'Распознан'}
                             </Typography><br/>
                             <Typography sx={{wordBreak: "break-word"}}>
                                 <strong> ФИО: </strong><br/>{modalData?.fio || null}

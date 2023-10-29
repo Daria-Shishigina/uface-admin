@@ -44,8 +44,8 @@ const HeaderComponents = () => {
       <UserMenu user={user}/>
       <Select value={'10'} sx={{ '.MuiOutlinedInput-notchedOutline': { border: 0 }}}>
         <MenuItem value={10}>Russian</MenuItem>
-        <MenuItem value={20}>English</MenuItem>
-        <MenuItem value={30}>Español</MenuItem>
+        {/*<MenuItem value={20}>English</MenuItem>*/}
+        {/*<MenuItem value={30}>Español</MenuItem>*/}
       </Select>
       <IconMain>
         <Link href='/dashboard/personal'>

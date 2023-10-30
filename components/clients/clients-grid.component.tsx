@@ -506,7 +506,8 @@ const VisitorsGrid = ({setBlocking}) => {
 
           const deleteFolk = async (e: any) => {
             e.stopPropagation();
-
+            const success = confirm('Вы уверены, что хотите удалить пользователя ?')
+            if (success === false) return false;
             let login = sessionStorage.getItem('login');
             let password = sessionStorage.getItem('password');
 
@@ -526,10 +527,8 @@ const VisitorsGrid = ({setBlocking}) => {
           const multiplySettings = async (e: any) => {
             e.stopPropagation();
 
-            const login = sessionStorage.getItem('login');
-            const password = sessionStorage.getItem('password');
             setBlocking(true);
-            await setMultiplySettingsModalData(e);
+            await setMultiplySettingsModalData(e, params);
             setBlocking(false)
           }
 
@@ -589,8 +588,9 @@ const VisitorsGrid = ({setBlocking}) => {
   const [snackBarOpen, setSnackBarOpen] = useState(false);
   const [snackBarText, setSnackBarText] = useState('');
   const [multiplySettingsModal, setMultiplySettingsModal] = useState(false);
+  const [currPersonId, setCurrPersonId] = useState('');
   const [selectionModel, setSelectionModel] = useState([]);
-  const [previousSelection, setPreviousSelection] = useState([]);
+  const [terminalPersonSettings, setTerminalPersonSettings] = useState({});
 
   const { status, data: terminalsData, error, isFetching } = useQuery(
       'terminals',
@@ -626,7 +626,8 @@ const VisitorsGrid = ({setBlocking}) => {
       }
   );
 
-  const setMultiplySettingsModalData = async (e) => {
+  const setMultiplySettingsModalData = async (e, params) => {
+    setCurrPersonId(params.row.personid)
     setMultiplySettingsModal(true);
   }
 
@@ -644,12 +645,25 @@ const VisitorsGrid = ({setBlocking}) => {
     })
   };
 
-  const onTerminalsSelectionSingle = (newSelection) => {
-    setSelectionModel(newSelection)
-    setPreviousSelection(newSelection)
-    const newSelectionSet = newSelection.filter((element) => !previousSelection.includes(element));
-    setSelectionModel(newSelectionSet)
-    setPreviousSelection(newSelectionSet)
+  const onTerminalsSelectionSingle = async (newSelection) => {
+    const lastTerminalId = newSelection[newSelection.length - 1];
+    setSelectionModel(lastTerminalId)
+    const {ip: terminalIp, port: terminalPort} = terminalsData.find(el => el.id === lastTerminalId);
+    const login = sessionStorage.getItem('login');
+    const password = sessionStorage.getItem('password');
+    const reqParam = {login, password, personid: currPersonId, terminal: `http://${terminalIp}:${terminalPort}/`};
+    const response = await fetch('api/getPersonSettings', {
+      method: 'POST',
+      body: JSON.stringify({data: reqParam}),
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    const data = JSON.parse(await response.json())
+    const settings = data.stateFind?.[0]?.settings?.[0];
+    if (settings === undefined) return setTerminalPersonSettings({});
+    console.log(settings)
+    setTerminalPersonSettings(settings);
   };
 
   // Update
@@ -861,7 +875,7 @@ const VisitorsGrid = ({setBlocking}) => {
                 <FormGroup>
                   <Grid container spacing={1}>
                     <Grid item xs={6} md={6}>
-                      <Box style={{backgroundColor: 'white', width: '50%', height: '89%', position: 'absolute',}}>
+                      <Box style={{backgroundColor: 'white', width: '50%', height: '89%', position: 'absolute'}}>
                       <DataGrid
                           style={{ backgroundColor: 'white' }}
                           rows={terminalsData}
@@ -879,7 +893,7 @@ const VisitorsGrid = ({setBlocking}) => {
                       {/*{terminalsData?.[0].dkey}*/}
 
 
-                      <FormControlLabel control={<Checkbox/>} onChange={handleChangeForm("cardAndPasswordPermission")} label="Card and password permission" />
+                      <FormControlLabel control={<Checkbox defaultChecked={parseInt(terminalPersonSettings?.cardAndPasswordPermission || 0)}/>} onChange={handleChangeForm("cardAndPasswordPermission")} label="Card and password permission" />
                       <br/>
                       <FormControlLabel control={<Checkbox />} onChange={handleChangeForm("faceAndCardPermission")} label="Face and card permission" />
                       <br/>
@@ -897,7 +911,7 @@ const VisitorsGrid = ({setBlocking}) => {
                         fullWidth
                         size="small"
                         type="number"
-                        defaultValue={0}
+                        defaultValue={terminalPersonSettings?.role || 0}
                         label='Role'
                         onChange={handleChangeForm("role")}
                       /><br/><br/>
@@ -905,7 +919,7 @@ const VisitorsGrid = ({setBlocking}) => {
                         fullWidth
                         size="small"
                         type="number"
-                        defaultValue={1}
+                        defaultValue={terminalPersonSettings?.type || 1}
                         label='Type'
                         onChange={handleChangeForm("type")}
                       /><br/><br/>
@@ -913,6 +927,7 @@ const VisitorsGrid = ({setBlocking}) => {
                       <TextField
                         fullWidth
                         size="small"
+                        defaultValue={terminalPersonSettings?.idcardNum || ""}
                         onChange={handleChangeForm("idcardNum")}
                         label='Id card number'
                       /><br/>
@@ -921,8 +936,9 @@ const VisitorsGrid = ({setBlocking}) => {
                       <TextField
                         fullWidth
                         size="small"
+                        defaultValue={terminalPersonSettings?.password || ""}
                         label='Password'
-                        onChange={handleChangeForm("Upassword")}
+                        onChange={handleChangeForm("password")}
                       /><br/>
                       <FormControlLabel control={<Checkbox/>} onChange={handleChangeForm("passwordPermission")} label="Password permission" />
                       <br/>
@@ -930,6 +946,7 @@ const VisitorsGrid = ({setBlocking}) => {
                         fullWidth
                         size="small"
                         label='Tag'
+                        defaultValue={terminalPersonSettings?.tag || ""}
                         onChange={handleChangeForm("tag")}
                       /><br/><br/>
                       <Button variant="contained">Загрузить данные</Button> &nbsp;

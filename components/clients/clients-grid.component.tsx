@@ -716,7 +716,10 @@ const VisitorsGrid = ({setBlocking}) => {
           setSnackBarText(`Person - ${selectedBox[i].fio};\nTerminal - ${terminalsSelectedBox[s].ip};\nPassed - ${reqPassed} / ${totalReqCount}`);
           // setSnackBarText(body.status);
         // }
-        if ((isSettings) && (body.status !== 'error')) {
+
+        if (typeof body === 'string') body = JSON.parse(body)
+
+          if ((isSettings) && (body.status !== 'error')) {
           body.stateSet.forEach(el => {
             //if (el.state === '-1') {
               if (!snackBarOpen) setSnackBarOpen(true)
@@ -743,7 +746,11 @@ const VisitorsGrid = ({setBlocking}) => {
           if (!snackBarOpen) setSnackBarOpen(true)
           setSnackBarText(body.status);
         }
-        if ((isSettings) && (body.status !== 'error')) {
+
+        if (typeof body === 'string') body = JSON.parse(body)
+
+          if ((isSettings) && (body.status !== 'error')) {
+
           body.stateSet.forEach(el => {
             //if (el.state === '-1') {
               if (!snackBarOpen) setSnackBarOpen(true)
